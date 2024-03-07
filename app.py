@@ -2,6 +2,11 @@ from flask import Flask, request, jsonify
 from web3 import Web3, HTTPProvider
 from solcx import compile_source
 from decouple import config
+import smtplib
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
+import random
+import string
 from flask_cors import CORS
 import re
 from web3.middleware import construct_sign_and_send_raw_middleware
@@ -284,6 +289,257 @@ def get_ticket_data():
         return jsonify({'status': 'error', 'message': str(e)}),500
 
 
+#///////////////////////////////////Email/////////////////////////7
+def generar_enlace_validacion():
+    # Generar un enlace único de validación (por ejemplo, utilizando una cadena aleatoria)
+    longitud = 20
+    caracteres = string.ascii_letters + string.digits
+    enlace = ''.join(random.choice(caracteres) for i in range(longitud))
+    return enlace
+
+def enviar_correo_validacion(correo_destino,enlace_validacion):
+    # Configuración del servidor SMTP
+    servidor_smtp = config('SERVIDOR_SMPT')
+    puerto_smtp = config('PUERTO_SMPT')
+    remitente = config('CORREO_REMITENTE')
+    contraseña = config('PASSWORD_GMAIL')
+
+    # Crear el mensaje
+    mensaje = MIMEMultipart()
+    mensaje['From'] = remitente
+    mensaje['To'] = correo_destino
+    mensaje['Subject'] = "Validación de correo electrónico"
+
+    # Cuerpo del mensaje en formato HTML
+    cuerpo_mensaje = f"""
+       <html>
+       <head>
+        <style>
+          body {{
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            padding: 20px;
+          }}
+          .container {{
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #fff;
+            border-radius: 10px;
+            padding: 30px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+          }}
+          h1 {{
+            color: #333;
+          }}
+          p {{
+            color: #666;
+          }}
+          .button {{
+            display: inline-block;
+            background-color: #007bff;
+            color: #fff;
+            padding: 10px 20px;
+            text-decoration: none;
+            border-radius: 5px;
+          }}
+        </style>
+      </head>
+      <body>
+        <div class="container">
+          <h1>Hola,  de MR biglietto </h1>
+          <p>Por favor, haz clic en el siguiente enlace para validar tu correo electrónico:</p>
+          <a class="button" href="https://mrbigliettoweb.vercel.app/login">Validar correo electrónico</a>
+          <p>¡Gracias!</p>
+        </div>
+      </body>
+    </html>
+    """
+    mensaje.attach(MIMEText(cuerpo_mensaje, 'html'))
+    # Iniciar sesión en el servidor SMTP y enviar el mensaje
+    with smtplib.SMTP(servidor_smtp, puerto_smtp) as servidor:
+        servidor.starttls()
+        servidor.login(remitente, contraseña)
+        servidor.send_message(mensaje)
+
+
+@app.route('/send_validation_email', methods=['POST'])
+def send_validation_email():
+    # Asegúrate de que el cuerpo de la solicitud contenga los parámetros necesarios para el método create_event
+    if not request.json or 'email_des' not in request.json:
+        return jsonify({'error': 'Missing parameters'}), 400
+
+    email_des = request.json['email_des']
+    # Llama al método create_event del contrato inteligente con los parámetros proporcionados
+    try:
+        enlace_validacion = generar_enlace_validacion()
+        enviar_correo_validacion(email_des,enlace_validacion)
+        return jsonify({'status': 'success'}),200
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+
+def generar_codigo_autenticacion():
+    # Generar un código de autenticación de 6 dígitos
+    return ''.join(random.choices(string.digits, k=6))
+
+def enviar_codigo_autenticacion(correo_destino,codigo):
+    # Configuración del servidor SMTP
+    servidor_smtp = config('SERVIDOR_SMPT')
+    puerto_smtp = config('PUERTO_SMPT')
+    remitente = config('CORREO_REMITENTE')
+    contraseña = config('PASSWORD_GMAIL')
+
+    # Crear el mensaje
+    mensaje = MIMEMultipart("alternative")
+    mensaje['From'] = remitente
+    mensaje['To'] = correo_destino
+    mensaje['Subject'] = "Código de autenticación de dos factores"
+
+	
+    # Cuerpo del mensaje en HTML con CSS
+    cuerpo_html = f"""
+    <html>
+      <head>
+        <style>
+          body {{
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            padding: 20px;
+          }}
+          .container {{
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #fff;
+            border-radius: 10px;
+            padding: 30px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+          }}
+          h1 {{
+            color: #333;
+          }}
+          p {{
+            color: #666;
+          }}
+          .code {{
+            font-size: 24px;
+            font-weight: bold;
+            color: #007bff;
+          }}
+        </style>
+      </head>
+      <body>
+        <div class="container">
+          <h1>Hola,</h1>
+          <p>Por favor, utiliza el siguiente código de autenticación de dos factores para completar tu proceso de verificación:</p>
+          <p class="code">{codigo}</p>
+          <p>Este código es válido por un tiempo limitado.</p>
+          <p>¡Gracias!</p>
+        </div>
+      </body>
+    </html>
+    """
+
+    # Adjuntar parte del mensaje
+    mensaje.attach(MIMEText(cuerpo_html, "html"))
+
+	# Iniciar sesión en el servidor SMTP y enviar el mensaje
+    with smtplib.SMTP(servidor_smtp, puerto_smtp) as servidor:
+        servidor.starttls()
+        servidor.login(remitente, contraseña)
+        servidor.send_message(mensaje)
+
+@app.route('/send_2fa_email', methods=['POST'])
+def send_2fa_email():
+    # Asegúrate de que el cuerpo de la solicitud contenga los parámetros necesarios para el método create_event
+    if not request.json or 'email_des' not in request.json:
+        return jsonify({'error': 'Missing parameters'}), 400
+
+    email_des = request.json['email_des']
+    # Llama al método create_event del contrato inteligente con los parámetros proporcionados
+    try:
+        codigo = generar_codigo_autenticacion()
+        enviar_codigo_autenticacion(email_des, codigo)
+        return jsonify({'status': 'success'}),200
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+def enviar_notificacion(correo_destino):
+    # Configuración del servidor SMTP
+    servidor_smtp = config('SERVIDOR_SMPT')
+    puerto_smtp = config('PUERTO_SMPT')
+    remitente = config('CORREO_REMITENTE')
+    contraseña = config('PASSWORD_GMAIL')
+
+    # Crear el mensaje
+    mensaje = MIMEMultipart("alternative")
+    mensaje['From'] = remitente
+    mensaje['To'] = correo_destino
+    mensaje['Subject'] = "Notificacion"
+
+	
+    # Cuerpo del mensaje en HTML con CSS
+    cuerpo_html = f"""
+    <html>
+      <head>
+        <style>
+          body {{
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            padding: 20px;
+          }}
+          .container {{
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #fff;
+            border-radius: 10px;
+            padding: 30px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+          }}
+          h1 {{
+            color: #333;
+          }}
+          p {{
+            color: #666;
+          }}
+          .code {{
+            font-size: 24px;
+            font-weight: bold;
+            color: #007bff;
+          }}
+        </style>
+      </head>
+      <body>
+        <div class="container">
+          <h1>Hola,</h1>
+          <p>Felicidades por tu compra, esperamos que te diviertas en tu evento:</p>
+          <p>¡Gracias! por usar Mr biglietto</p>
+        </div>
+      </body>
+    </html>
+    """
+
+    # Adjuntar parte del mensaje
+    mensaje.attach(MIMEText(cuerpo_html, "html"))
+
+	# Iniciar sesión en el servidor SMTP y enviar el mensaje
+    with smtplib.SMTP(servidor_smtp, puerto_smtp) as servidor:
+        servidor.starttls()
+        servidor.login(remitente, contraseña)
+        servidor.send_message(mensaje)
+
+@app.route('/send_notification', methods=['POST'])
+def send_notification():
+    # Asegúrate de que el cuerpo de la solicitud contenga los parámetros necesarios para el método create_event
+    if not request.json or 'email_des' not in request.json:
+        return jsonify({'error': 'Missing parameters'}), 400
+
+    email_des = request.json['email_des']
+    # Llama al método create_event del contrato inteligente con los parámetros proporcionados
+    try:
+        enviar_notificacion(email_des)
+        return jsonify({'status': 'success'}),200
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
 
 
 if __name__ == '__main__':
