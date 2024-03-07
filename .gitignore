@@ -2,3 +2,5 @@
 main.py
 test_api.py
 .venv/
+setup_env.py
+test_email.py
