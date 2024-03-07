@@ -186,7 +186,7 @@ abi = [
 contract = web3.eth.contract(address=contract_address, abi=abi)
 
 app = Flask(__name__)
-CORS(app)
+CORS(app, supports_credentials=True)
 
 @app.route('/')
 def root():
