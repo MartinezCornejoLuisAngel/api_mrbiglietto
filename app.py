@@ -541,6 +541,89 @@ def send_notification():
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
+def send_change_pass(correo_destino,token):
+    # Configuración del servidor SMTP
+    servidor_smtp = config('SERVIDOR_SMPT')
+    puerto_smtp = config('PUERTO_SMPT')
+    remitente = config('CORREO_REMITENTE')
+    contraseña = config('PASSWORD_GMAIL')
+
+    # Crear el mensaje
+    mensaje = MIMEMultipart("alternative")
+    mensaje['From'] = remitente
+    mensaje['To'] = correo_destino
+    mensaje['Subject'] = "Cambio de contraseña"
+
+	
+    # Cuerpo del mensaje en HTML con CSS
+    cuerpo_html = f"""
+    <html>
+       <head>
+        <style>
+          body {{
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            padding: 20px;
+          }}
+          .container {{
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #fff;
+            border-radius: 10px;
+            padding: 30px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+          }}
+          h1 {{
+            color: #333;
+          }}
+          p {{
+            color: #666;
+          }}
+          .button {{
+            display: inline-block;
+            background-color: #007bff;
+            color: #fff;
+            padding: 10px 20px;
+            text-decoration: none;
+            border-radius: 5px;
+          }}
+        </style>
+      </head>
+      <body>
+        <div class="container">
+          <h1>Hola, soy misterbiglietto</h1>
+          <p>Por favor, haz clic en el siguiente enlace para restablecer tu contraseña:</p>
+          <a class="button" href="https://mrbigliettoweb.vercel.app/login/change?token={token}">Cambiar contraseña</a>
+          <p>¡Gracias!</p>
+        </div>
+      </body>
+    </html>
+    """
+
+    # Adjuntar parte del mensaje
+    mensaje.attach(MIMEText(cuerpo_html, "html"))
+
+	# Iniciar sesión en el servidor SMTP y enviar el mensaje
+    with smtplib.SMTP(servidor_smtp, puerto_smtp) as servidor:
+        servidor.starttls()
+        servidor.login(remitente, contraseña)
+        servidor.send_message(mensaje)
+
+@app.route('/send_email_change_password', methods=['POST'])
+def send_email_change_password():
+    # Asegúrate de que el cuerpo de la solicitud contenga los parámetros necesarios para el método create_event
+    if not request.json or 'email' not in request.json or 'token' not in request.json:
+        return jsonify({'error': 'Missing parameters'}), 400
+
+    email_des = request.json['email']
+    token = request.json['token']
+    # Llama al método create_event del contrato inteligente con los parámetros proporcionados
+    try:
+        send_change_pass(email_des,token)
+        return jsonify({'status': 'success'}),200
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
 
 if __name__ == '__main__':
     app.run()
