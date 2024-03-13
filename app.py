@@ -9,6 +9,7 @@ import random
 import string
 from flask_cors import CORS
 import re
+import requests
 from web3.middleware import construct_sign_and_send_raw_middleware
 
 # Conexión a la red de Ethereum (en este caso, una red de prueba)
@@ -448,18 +449,27 @@ def enviar_codigo_autenticacion(correo_destino,codigo):
         servidor.login(remitente, contraseña)
         servidor.send_message(mensaje)
 
-@app.route('/send_2fa_email', methods=['POST'])
+@app.route('/api/v1/send_2fa_email', methods=['POST'])
 def send_2fa_email():
     # Asegúrate de que el cuerpo de la solicitud contenga los parámetros necesarios para el método create_event
-    if not request.json or 'email_des' not in request.json:
+    if not request.json or 'email_des' not in request.json or 'token' not in request.json:
         return jsonify({'error': 'Missing parameters'}), 400
 
     email_des = request.json['email_des']
+    token = request.json['token']
     # Llama al método create_event del contrato inteligente con los parámetros proporcionados
     try:
         codigo = generar_codigo_autenticacion()
-        enviar_codigo_autenticacion(email_des, codigo)
-        return jsonify({'status': 'success'}),200
+        payload = {'code':int(codigo)}
+        headers = {'Authorization':'Bearer '+token}
+        response = requests.put(config('URL_BASE_BD')+'/api/v1/TwoFactorAuth',json=payload,headers=headers)
+       
+        if response.status_code == 200:
+          enviar_codigo_autenticacion(email_des, codigo)
+          return jsonify({'status': 'success'}),200
+        else:
+          return jsonify({'error': 'Failed to send 2FA code'}), response.status_code
+
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
@@ -534,6 +544,7 @@ def send_notification():
         return jsonify({'error': 'Missing parameters'}), 400
 
     email_des = request.json['email_des']
+    
     # Llama al método create_event del contrato inteligente con los parámetros proporcionados
     try:
         enviar_notificacion(email_des)
