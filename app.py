@@ -691,7 +691,7 @@ def status_404(errror):
 
 if __name__ == '__main__':
     app.config.from_object(d_config['development'])
-    app.secret_key = d_config['secret_key']
+    app.secret_key = config('FLASH_SECRET_KEY')
     app.register_error_handler(401,status_401)
     app.register_error_handler(404,status_404)
     
