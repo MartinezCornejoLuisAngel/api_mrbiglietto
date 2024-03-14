@@ -194,7 +194,9 @@ contract = web3.eth.contract(address=contract_address, abi=abi)
 
 app = Flask(__name__)
 CORS(app, supports_credentials=True)
+app.secret_key = config('FLASH_SECRET_KEY')
 login_manager_app = LoginManager(app)
+
 
 @login_manager_app.user_loader
 def load_user(username):
@@ -691,7 +693,6 @@ def status_404(errror):
 
 if __name__ == '__main__':
     app.config.from_object(d_config['development'])
-    app.secret_key = config('FLASH_SECRET_KEY')
     app.register_error_handler(401,status_401)
     app.register_error_handler(404,status_404)
     
