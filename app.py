@@ -1,6 +1,5 @@
 from flask import Flask, request, jsonify, render_template, redirect , url_for,flash
 from flask_login import LoginManager,login_user, logout_user, login_required
-from flask_wtf.csrf import CSRFProtect
 from web3 import Web3, HTTPProvider
 from solcx import compile_source
 from decouple import config
@@ -195,7 +194,6 @@ contract = web3.eth.contract(address=contract_address, abi=abi)
 
 app = Flask(__name__)
 CORS(app, supports_credentials=True)
-csrf= CSRFProtect()
 login_manager_app = LoginManager(app)
 
 @login_manager_app.user_loader
@@ -694,7 +692,6 @@ def status_404(errror):
 if __name__ == '__main__':
     app.config.from_object(d_config['development'])
     app.secret_key = d_config['secret_key']
-    csrf.init_app(app)
     app.register_error_handler(401,status_401)
     app.register_error_handler(404,status_404)
     
