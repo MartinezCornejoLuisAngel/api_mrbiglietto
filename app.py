@@ -656,7 +656,7 @@ def login():
     password = request.form['password']
     #print(username)
     #print(password)
-    user = User(0,username,password) 
+    user = User(1,username,password) 
     logged_user  = ModelUser.login(user)
     if logged_user.status_code == 200:
       login_user(user)
