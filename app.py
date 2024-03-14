@@ -13,7 +13,7 @@ import re
 import requests
 from web3.middleware import construct_sign_and_send_raw_middleware
 from config import d_config
-
+from flask_wtf.csrf import CSRFProtect
 from models.ModelUser import ModelUser
 from models.entities.User import User
 
@@ -196,7 +196,7 @@ app = Flask(__name__)
 CORS(app, supports_credentials=True)
 app.secret_key = config('FLASH_SECRET_KEY')
 login_manager_app = LoginManager(app)
-
+csrf = CSRFProtect()
 
 @login_manager_app.user_loader
 def load_user(username):
@@ -690,10 +690,11 @@ def status_401(error):
 def status_404(errror):
   return "<h1>Página no encontrada</h1>",404
 
+app.register_error_handler(401,status_401)
+app.register_error_handler(404,status_404)
+csrf.init_app(app)
 
 if __name__ == '__main__':
-    app.config.from_object(d_config['development'])
-    app.register_error_handler(401,status_401)
-    app.register_error_handler(404,status_404)
-    
+    app.config.from_object(d_config['development'])   
+  
     app.run()
