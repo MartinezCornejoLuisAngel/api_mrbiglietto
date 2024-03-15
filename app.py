@@ -319,7 +319,6 @@ def enviar_correo_validacion(correo_destino,token):
     mensaje['From'] = remitente
     mensaje['To'] = correo_destino
     mensaje['Subject'] = "Validación de correo electrónico"
-
     # Cuerpo del mensaje en formato HTML
     cuerpo_mensaje = render_template('correo_validacion.html',token=token)
     mensaje.attach(MIMEText(cuerpo_mensaje, 'html'))
@@ -531,41 +530,9 @@ def send_change_pass(correo_destino,token):
     mensaje['To'] = correo_destino
     mensaje['Subject'] = "Cambio de contraseña"
 
-	
-    # Cuerpo del mensaje en HTML con CSS
-    cuerpo_html = f"""
-    <html>
-      <head>
-       
-      </head>
-      <body>
-          <div style="text-align: center; color: #2B3A55; font-size: 60px; font-weight: 700; word-wrap: break-word; margin-top: 20px;">
-                  mr biglietto
-          </div>
-          <div style="width: 816px; height: auto; position: relative; margin: 0 auto; box-shadow: 0px 5px 15px 5px rgba(0, 0, 0, 0.10); padding: 20px;">
-              <div style="text-align: center; color: #2B3A55; font-size: 20px; font-weight: 400; word-wrap: word-wrap;">
-                  Estimado usuario, haz click en el siguiente enlace para reestablecer tu contraseña:
-              </div>              
-              <div style="text-align: center; margin-top: 20px;">
-                <div style="width: 100%; text-align: center;">
-                  <a href="https://mrbigliettoweb.vercel.app/login/change?token={token}" style="color: #E8ECF1; font-size: 18px; font-weight: 400; word-wrap: word-wrap; display: inline-block; margin-left: 10px; vertical-align: middle; text-decoration: none;">
-                      <div style="width: 274px; height: 72px; background: #2B3A55; border-radius: 10px; display: inline-block; line-height: 72px;">
-                          Reestablecer contraseña
-                      </div>
-                  </a>
-                </div>
-            </div>
-            <div style="text-align: center; color: #2B3A55; font-size: 20px; font-weight: 400; word-wrap: break-word; margin-top: 20px;">
-                  Cualquier duda que se te presente, contáctanos.
-            </div>
-          </div>
-      </body>
-  </html>
-
-    """
-
+    cuerpo_mensaje = render_template('correo_change_pass.html',token=token)
     # Adjuntar parte del mensaje
-    mensaje.attach(MIMEText(cuerpo_html, "html"))
+    mensaje.attach(MIMEText(cuerpo_mensaje, "html"))
 
 	# Iniciar sesión en el servidor SMTP y enviar el mensaje
     with smtplib.SMTP(servidor_smtp, puerto_smtp) as servidor:
