@@ -1,0 +1,56 @@
+/* Estilo adicional para el sidebar */
+.sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 250px;
+    padding: 20px;
+    background-color: #059edb; /* Azul cielo */
+    color: #000; /* Color de texto */
+  }
+
+  .sidebar-link {
+    color: #000; /* Color de texto para los enlaces */
+    display: block;
+    text-align: center;
+    margin-bottom: 10px;
+  }
+
+  .sidebar-link:hover {
+    text-decoration: none;
+    color: #fff; /* Cambia a blanco cuando se pasa el ratón */
+  }
+
+  .sidebar-link-btn {
+    display: block;
+    width: 100%;
+    padding: 10px;
+    background-color: #87b9ed; /* Azul primario de Bootstrap */
+    color: #fff; /* Color de texto */
+    border: none;
+    border-radius: 5px;
+    text-align: center;
+    margin-bottom: 10px;
+  }
+
+  .sidebar-link-btn:hover {
+    text-decoration: none;
+    color: #000;
+    background-color: #2970bb; /* Cambia a un tono más oscuro al pasar el ratón */
+  }
+
+/* Estilo adicional para el contenido principal */
+.main-content {
+    margin-left: 250px; /* Margen izquierdo igual al ancho del sidebar */
+    padding-top: 20px; /* Espacio superior */
+}
+
+.main-title {
+    text-align: center;
+  }
+
+.main-content .card {
+    width: 60%; /* Ancho del 60% */
+    margin: auto; /* Centrar el cardview */
+}
