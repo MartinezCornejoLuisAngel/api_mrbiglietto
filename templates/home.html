@@ -2,8 +2,57 @@
 
 {%block title%}Home{%endblock%}
 
+{%block customCss%}
+<link rel="stylesheet" href="{{url_for('static',filename='css/home.css')}}">
+{%endblock%}
+
 
 {%block body%}
-    <h1>Welcome, {{current_user.username}} </h1>
-    <a class="btn btn-secondary" href="{{url_for('logout')}}">Logout</a>
+    <div class="container-fluid">
+        <div class="row">
+          <!-- Sidebar -->
+          <div class="container-fluid">
+            <div class="row">
+              <!-- Sidebar -->
+              <div class="col-md-3 sidebar">
+                <h3>Welcome, {{current_user.username}}</h3>
+                <ul class="list-unstyled mt-4">
+                  <li><a href="{{url_for('home')}}" class="sidebar-link-btn">Registrar Evento</a></li>
+                  <li><a href="{{url_for('login')}}" class="sidebar-link-btn">View 2</a></li>
+                  <li><a href="{{url_for('login')}}" class="sidebar-link-btn">View 3</a></li>
+                  <li><a href="{{url_for('logout')}}" class="sidebar-link-btn">Logout</a></li>
+
+                </ul>
+              </div>
+        
+              <!-- Main Content -->
+              <div class="col-md-9 main-content">
+                <div class="card">
+                  <div class="card-body">
+                            <h2 class="card-title text-center">Registrar Evento</h2>
+                        <!-- Aquí va tu formulario o cualquier otro contenido principal -->
+                        <form>
+                            <div class="form-group">
+                                <label for="exampleFormControlInput1">Nombre del Evento</label>
+                                <input type="text" class="form-control" id="exampleFormControlInput" placeholder="Nombre del evento">
+                            </div>
+                            <div class="form-group">
+                                <label for="exampleFormControlDate">Select a Date</label>
+                                <input type="date" class="form-control" id="exampleFormControlDate">
+                            </div>
+                            <button type="submit" class="btn btn-primary">Submit</button>
+                        </form>
+                        </div>
+                    </div>
+                </div>
+            <!--fin main content-->
+                </div>
+              </div>
+            </div>
+          </div>
+      <!-- Bootstrap JS -->
+      <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+      <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+      <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    
 {%endblock%}

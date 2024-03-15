@@ -1,7 +1,7 @@
 from decouple import config
 
 class DevelopmentConfig():
-    DEBUG = False
+    DEBUG = True
 
 d_config={
     'development':DevelopmentConfig,

@@ -196,7 +196,6 @@ app = Flask(__name__)
 CORS(app, supports_credentials=True)
 app.secret_key = config('FLASH_SECRET_KEY')
 login_manager_app = LoginManager(app)
-csrf = CSRFProtect()
 
 @login_manager_app.user_loader
 def load_user(username):
@@ -675,7 +674,7 @@ def logout():
   return redirect(url_for('login'))
 
 @app.route('/home')
-@login_required
+#@login_required
 def home():
   return render_template('/home.html')
 
@@ -692,7 +691,6 @@ def status_404(errror):
 
 app.register_error_handler(401,status_401)
 app.register_error_handler(404,status_404)
-csrf.init_app(app)
 
 if __name__ == '__main__':
     app.config.from_object(d_config['development'])   
