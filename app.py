@@ -307,7 +307,7 @@ def generar_enlace_validacion():
     enlace = ''.join(random.choice(caracteres) for i in range(longitud))
     return enlace
 
-def enviar_correo_validacion(correo_destino,enlace_validacion):
+def enviar_correo_validacion(correo_destino,token):
     # Configuración del servidor SMTP
     servidor_smtp = config('SERVIDOR_SMPT')
     puerto_smtp = config('PUERTO_SMPT')
@@ -321,49 +321,7 @@ def enviar_correo_validacion(correo_destino,enlace_validacion):
     mensaje['Subject'] = "Validación de correo electrónico"
 
     # Cuerpo del mensaje en formato HTML
-    cuerpo_mensaje = f"""
-       <html>
-       <head>
-        <style>
-          body {{
-            font-family: Arial, sans-serif;
-            background-color: #f4f4f4;
-            padding: 20px;
-          }}
-          .container {{
-            max-width: 600px;
-            margin: 0 auto;
-            background-color: #fff;
-            border-radius: 10px;
-            padding: 30px;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-          }}
-          h1 {{
-            color: #333;
-          }}
-          p {{
-            color: #666;
-          }}
-          .button {{
-            display: inline-block;
-            background-color: #007bff;
-            color: #fff;
-            padding: 10px 20px;
-            text-decoration: none;
-            border-radius: 5px;
-          }}
-        </style>
-      </head>
-      <body>
-        <div class="container">
-          <h1>Hola,  de MR biglietto </h1>
-          <p>Por favor, haz clic en el siguiente enlace para validar tu correo electrónico:</p>
-          <a class="button" href="https://mrbigliettoweb.vercel.app/login">Validar correo electrónico</a>
-          <p>¡Gracias!</p>
-        </div>
-      </body>
-    </html>
-    """
+    cuerpo_mensaje = render_template('correo_validacion.html',token=token)
     mensaje.attach(MIMEText(cuerpo_mensaje, 'html'))
     # Iniciar sesión en el servidor SMTP y enviar el mensaje
     with smtplib.SMTP(servidor_smtp, puerto_smtp) as servidor:
@@ -371,22 +329,21 @@ def enviar_correo_validacion(correo_destino,enlace_validacion):
         servidor.login(remitente, contraseña)
         servidor.send_message(mensaje)
 
-
 @app.route('/send_validation_email', methods=['POST'])
 def send_validation_email():
     # Asegúrate de que el cuerpo de la solicitud contenga los parámetros necesarios para el método create_event
-    if not request.json or 'email_des' not in request.json:
+    if not request.json or 'email_des' not in request.json or 'token' not in request.json:
         return jsonify({'error': 'Missing parameters'}), 400
 
     email_des = request.json['email_des']
+    token = request.json['token']
     # Llama al método create_event del contrato inteligente con los parámetros proporcionados
     try:
         enlace_validacion = generar_enlace_validacion()
-        enviar_correo_validacion(email_des,enlace_validacion)
+        enviar_correo_validacion(email_des,token)
         return jsonify({'status': 'success'}),200
     except Exception as e:
         return jsonify({'error': str(e)}), 500
-
 
 def generar_codigo_autenticacion():
     # Generar un código de autenticación de 6 dígitos
@@ -578,46 +535,33 @@ def send_change_pass(correo_destino,token):
     # Cuerpo del mensaje en HTML con CSS
     cuerpo_html = f"""
     <html>
-       <head>
-        <style>
-          body {{
-            font-family: Arial, sans-serif;
-            background-color: #f4f4f4;
-            padding: 20px;
-          }}
-          .container {{
-            max-width: 600px;
-            margin: 0 auto;
-            background-color: #fff;
-            border-radius: 10px;
-            padding: 30px;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-          }}
-          h1 {{
-            color: #333;
-          }}
-          p {{
-            color: #666;
-          }}
-          .button {{
-            display: inline-block;
-            background-color: #007bff;
-            color: #fff;
-            padding: 10px 20px;
-            text-decoration: none;
-            border-radius: 5px;
-          }}
-        </style>
+      <head>
+       
       </head>
       <body>
-        <div class="container">
-          <h1>Hola, soy misterbiglietto</h1>
-          <p>Por favor, haz clic en el siguiente enlace para restablecer tu contraseña:</p>
-          <a class="button" href="https://mrbigliettoweb.vercel.app/login/change?token={token}">Cambiar contraseña</a>
-          <p>¡Gracias!</p>
-        </div>
+          <div style="text-align: center; color: #2B3A55; font-size: 60px; font-weight: 700; word-wrap: break-word; margin-top: 20px;">
+                  mr biglietto
+          </div>
+          <div style="width: 816px; height: auto; position: relative; margin: 0 auto; box-shadow: 0px 5px 15px 5px rgba(0, 0, 0, 0.10); padding: 20px;">
+              <div style="text-align: center; color: #2B3A55; font-size: 20px; font-weight: 400; word-wrap: word-wrap;">
+                  Estimado usuario, haz click en el siguiente enlace para reestablecer tu contraseña:
+              </div>              
+              <div style="text-align: center; margin-top: 20px;">
+                <div style="width: 100%; text-align: center;">
+                  <a href="https://mrbigliettoweb.vercel.app/login/change?token={token}" style="color: #E8ECF1; font-size: 18px; font-weight: 400; word-wrap: word-wrap; display: inline-block; margin-left: 10px; vertical-align: middle; text-decoration: none;">
+                      <div style="width: 274px; height: 72px; background: #2B3A55; border-radius: 10px; display: inline-block; line-height: 72px;">
+                          Reestablecer contraseña
+                      </div>
+                  </a>
+                </div>
+            </div>
+            <div style="text-align: center; color: #2B3A55; font-size: 20px; font-weight: 400; word-wrap: break-word; margin-top: 20px;">
+                  Cualquier duda que se te presente, contáctanos.
+            </div>
+          </div>
       </body>
-    </html>
+  </html>
+
     """
 
     # Adjuntar parte del mensaje
