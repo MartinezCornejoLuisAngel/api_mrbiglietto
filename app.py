@@ -299,7 +299,7 @@ def get_ticket_data():
         return jsonify({'status': 'error', 'message': str(e)}),500
 
 
-#///////////////////////////////////Email/////////////////////////7
+#/////////////////////////////////// API EMAIL /////////////////////////////////////////
 def generar_enlace_validacion():
     # Generar un enlace único de validación (por ejemplo, utilizando una cadena aleatoria)
     longitud = 20
@@ -438,7 +438,7 @@ def send_2fa_email():
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
-def enviar_notificacion(correo_destino):
+def enviar_notificacion(email,username,event_name):
     # Configuración del servidor SMTP
     servidor_smtp = config('SERVIDOR_SMPT')
     puerto_smtp = config('PUERTO_SMPT')
@@ -448,53 +448,12 @@ def enviar_notificacion(correo_destino):
     # Crear el mensaje
     mensaje = MIMEMultipart("alternative")
     mensaje['From'] = remitente
-    mensaje['To'] = correo_destino
+    mensaje['To'] = email
     mensaje['Subject'] = "Notificacion"
-
-	
     # Cuerpo del mensaje en HTML con CSS
-    cuerpo_html = f"""
-    <html>
-      <head>
-        <style>
-          body {{
-            font-family: Arial, sans-serif;
-            background-color: #f4f4f4;
-            padding: 20px;
-          }}
-          .container {{
-            max-width: 600px;
-            margin: 0 auto;
-            background-color: #fff;
-            border-radius: 10px;
-            padding: 30px;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-          }}
-          h1 {{
-            color: #333;
-          }}
-          p {{
-            color: #666;
-          }}
-          .code {{
-            font-size: 24px;
-            font-weight: bold;
-            color: #007bff;
-          }}
-        </style>
-      </head>
-      <body>
-        <div class="container">
-          <h1>Hola,</h1>
-          <p>Felicidades por tu compra, esperamos que te diviertas en tu evento:</p>
-          <p>¡Gracias! por usar Mr biglietto</p>
-        </div>
-      </body>
-    </html>
-    """
-
+    cuerpo_mensaje = render_template('email_notification.html',username=username,event_name=event_name)
     # Adjuntar parte del mensaje
-    mensaje.attach(MIMEText(cuerpo_html, "html"))
+    mensaje.attach(MIMEText(cuerpo_mensaje, "html"))
 
 	# Iniciar sesión en el servidor SMTP y enviar el mensaje
     with smtplib.SMTP(servidor_smtp, puerto_smtp) as servidor:
@@ -502,17 +461,19 @@ def enviar_notificacion(correo_destino):
         servidor.login(remitente, contraseña)
         servidor.send_message(mensaje)
 
-@app.route('/send_notification', methods=['POST'])
+@app.route('/api/v1/send_notification', methods=['POST'])
 def send_notification():
     # Asegúrate de que el cuerpo de la solicitud contenga los parámetros necesarios para el método create_event
-    if not request.json or 'email_des' not in request.json:
+    if not request.json or 'email' not in request.json or 'username' not in request.json or 'event_name' not in request.json:
         return jsonify({'error': 'Missing parameters'}), 400
 
-    email_des = request.json['email_des']
+    email = request.json['email']
+    username = request.json['username']
+    event_name = request.json['event_name']
     
     # Llama al método create_event del contrato inteligente con los parámetros proporcionados
     try:
-        enviar_notificacion(email_des)
+        enviar_notificacion(email,username,event_name)
         return jsonify({'status': 'success'}),200
     except Exception as e:
         return jsonify({'error': str(e)}), 500
@@ -585,7 +546,7 @@ def logout():
   return redirect(url_for('login'))
 
 @app.route('/home')
-#@login_required
+@login_required
 def home():
   return render_template('/home.html')
 

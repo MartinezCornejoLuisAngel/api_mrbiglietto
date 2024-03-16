@@ -1,0 +1,14 @@
+body {
+  font-family: 'Josefin Sans', sans-serif; /* Aplica Josefin Sans al contenido del body */
+}
+/* Puedes definir estilos adicionales para otros elementos */
+h1 {
+  font-family: 'Josefin Sans', sans-serif; /* Ejemplo de aplicar la fuente a un elemento específico */
+}
+footer {
+    background-color: #333;
+    color: #fff;
+    padding: 20px;
+    text-align: center;
+  }
+  
