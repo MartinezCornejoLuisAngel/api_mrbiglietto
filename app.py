@@ -523,6 +523,45 @@ def send_email_change_password():
         return jsonify({'status': 'success'}),200
     except Exception as e:
         return jsonify({'error': str(e)}), 500
+      
+def send_email_help_to(email_user,email_help,message):
+    servidor_smtp = config('SERVIDOR_SMPT')
+    puerto_smtp = config('PUERTO_SMPT')
+    remitente = config('CORREO_REMITENTE')
+    contraseña = config('PASSWORD_GMAIL')
+
+    # Crear el mensaje
+    mensaje = MIMEMultipart("alternative")
+    mensaje['From'] = remitente
+    mensaje['To'] = email_help
+    mensaje['Subject'] = "Solicitud de ayuda"
+
+    cuerpo_mensaje = render_template('email_help.html',email_user = email_user,message = message)
+    # Adjuntar parte del mensaje
+    mensaje.attach(MIMEText(cuerpo_mensaje, "html"))
+
+	# Iniciar sesión en el servidor SMTP y enviar el mensaje
+    with smtplib.SMTP(servidor_smtp, puerto_smtp) as servidor:
+        servidor.starttls()
+        servidor.login(remitente, contraseña)
+        servidor.send_message(mensaje)
+
+      
+@app.route('/api/v1/send_email_help',methods=['POST'])
+def send_email_help():
+  if not request.json or 'email_user' not in request.json or 'email_help' not in request.json or 'message' not in request.json:
+    return jsonify({'error':'Missing parameters'}), 400
+  
+  email_user = request.json['email_user']
+  email_help = request.json['email_help']
+  message = request.json['message']
+  
+  try:
+    send_email_help_to(email_user,email_help,message)
+    return jsonify({'status': 'success'}),20
+  except Exception as e:
+    return jsonify({'error':str(e)}), 500
+  
 
 #/////////////////////////////////Página web////////////////////
 @app.route('/')
