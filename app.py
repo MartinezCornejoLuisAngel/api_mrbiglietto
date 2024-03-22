@@ -558,7 +558,7 @@ def send_email_help():
   
   try:
     send_email_help_to(email_user,email_help,message)
-    return jsonify({'status': 'success'}),20
+    return jsonify({'status': 'success'}),200
   except Exception as e:
     return jsonify({'error':str(e)}), 500
   
