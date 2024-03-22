@@ -1,4 +1,4 @@
-{%extends './base.html' %}
+{%extends './base_registros.html' %}
 
 {%block title%}Home{%endblock%}
 
@@ -12,19 +12,7 @@
         <div class="row">
           <!-- Sidebar -->
           <div class="container-fluid">
-            <div class="row">
-              <!-- Sidebar -->
-              <div class="col-md-3 sidebar">
-                <h3>Welcome, {{current_user.username}}</h3>
-                <ul class="list-unstyled mt-4">
-                  <li><a href="{{url_for('home')}}" class="sidebar-link-btn">Registrar Evento</a></li>
-                  <li><a href="{{url_for('login')}}" class="sidebar-link-btn">View 2</a></li>
-                  <li><a href="{{url_for('login')}}" class="sidebar-link-btn">View 3</a></li>
-                  <li><a href="{{url_for('logout')}}" class="sidebar-link-btn">Logout</a></li>
-
-                </ul>
-              </div>
-        
+            <div class="row">        
               <!-- Main Content -->
               <div class="col-md-9 main-content">
                 <div class="card">

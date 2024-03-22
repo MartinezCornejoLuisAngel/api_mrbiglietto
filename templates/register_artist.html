@@ -1,0 +1,76 @@
+{%extends './base_registros.html' %}
+
+{%block title%}Artista{%endblock%}
+
+{%block customCss%}
+<link rel="stylesheet" href="{{url_for('static',filename='css/home.css')}}">
+{%endblock%}
+{%block body%}
+<div class="container-fluid">
+    <div class="row">
+        <!-- Sidebar -->
+        <div class="container-fluid">
+            <div class="row">
+                <!-- Main Content -->
+                <div class="col-md-9 main-content">
+                    <div class="card">
+                        <div class="card-body">
+                            <h2 class="card-title text-center">Registrar Artista</h2>
+                            <!-- Aquí va tu formulario o cualquier otro contenido principal -->
+                           
+                            <form class="form-signin" action="/register_artist" method="POST">
+                                {% with messages = get_flashed_messages() %}
+                                {% if messages%}
+                                <br />
+                                {% for message in messages %}
+                                <div class="alert alert-primary alert-dismissible" role="alert">
+                                    <strong>{{message}}</strong>
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert"
+                                        aria-label="Close"></button>
+    
+                                </div>
+                                {% endfor %}
+                                {% endif%}
+                                {% endwith %}
+                                <div class="form-floating">
+                                    <input type="text" class="form-control" id="artistName" name="artistName" placeholder="Artist name" maxlength="50" required>
+                                    <label for="artistName">Artist name</label>
+                                </div>
+                                <br>
+                                <div class="form-floating">
+                                    <textarea type="text" class="form-control" id="artistDescription" name="artistDescription" placeholder="Description"required></textarea>
+                                    <label for="artistDescription">Description</label>
+                                </div>
+                                <br>
+                                <div class="form-floating">
+                                    <input type="text" class="form-control" id="artistGenre" name="artistGenre" placeholder="Genre" maxlength="30" required>
+                                    <label for="artistGenre">Genre</label>
+                                </div>
+                                <br>
+                                <div class="form-floating">
+                                    <input type="text" class="form-control" id="artistUrl" name="artistUrl" placeholder="URL" required>
+                                    <label for="artistUrl">URL</label>
+                                </div>
+                                <br>
+                                <div class="form-floating">
+                                    <input type="text" class="form-control" id="artistTourName" name="artistTourName" placeholder="TOUR NAME" maxlength="200" required>
+                                    <label for="artistTourName">Tour name</label>
+                                </div>
+                                <br>
+                                <button type="submit" class="btn btn-primary">Submit</button>
+                            </form>
+
+                        </div>
+                    </div>
+                </div>
+                <!--fin main content-->
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Bootstrap JS -->
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+{%endblock%}
