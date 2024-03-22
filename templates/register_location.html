@@ -1,0 +1,113 @@
+{%extends './base_registros.html' %}
+
+{%block title%}Locación{%endblock%}
+
+{%block customCss%}
+<link rel="stylesheet" href="{{url_for('static',filename='css/home.css')}}">
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+{%endblock%}
+
+{%block body%}
+<div class="container-fluid">
+    <div class="row">
+        <!-- Sidebar -->
+        <div class="container-fluid">
+            <div class="row">
+                <!-- Main Content -->
+                <div class="col-md-9 main-content">
+                    <div class="card">
+                        <div class="card-body">
+                            <h2 class="card-title text-center">Registrar Locación</h2>
+                            <!-- Aquí va tu formulario o cualquier otro contenido principal -->
+                            <form class="form-signin" action="/register_location" method="POST">
+                                {% with messages = get_flashed_messages() %}
+                                {% if messages%}
+                                <br />
+                                {% for message in messages %}
+                                <div class="alert alert-primary alert-dismissible" role="alert">
+                                    <strong>{{message}}</strong>
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert"
+                                        aria-label="Close"></button>
+
+                                </div>
+                                {% endfor %}
+                                {% endif%}
+                                {% endwith %}
+                                <div class="form-floating">
+                                    <input type="number" class="form-control" id="id" name="id" placeholder="ID" min="0"
+                                        required>
+                                    <label for="id">Id</label>
+                                    <p id="repeatedMessage" style="color: red;"></p>
+                                </div>
+
+                                <br>
+                                <div class="form-floating">
+                                    <input type="text" class="form-control" id="country" name="country"
+                                        placeholder="Country" maxlength="20" required>
+                                    <label for="country">Country</label>
+                                </div>
+                                <br>
+                                <div class="form-floating">
+                                    <input type="text" class="form-control" id="state" name="state" placeholder="State"
+                                        maxlength="20" required>
+                                    <label for="state">State</label>
+                                </div>
+                                <br>
+                                <div class="form-floating">
+                                    <input type="text" class="form-control" id="city" name="city" placeholder="City"
+                                        maxlength="20" required>
+                                    <label for="city">City</label>
+                                </div>
+                                <br>
+                                <div class="form-floating">
+                                    <input type="text" class="form-control" id="colony" name="colony"
+                                        placeholder="Colony" maxlength="20" required>
+                                    <label for="colony">Colony</label>
+                                </div>
+                                <br>
+                                <div class="form-floating">
+                                    <input type="number" class="form-control" id="postal_code" name="postal_code"
+                                        placeholder="Postal code" min="0" required>
+                                    <label for="postal_code">Postal code</label>
+                                </div>
+                                <br>
+                                <div class="form-floating">
+                                    <input type="text" class="form-control" id="address" name="address"
+                                        placeholder="Address" maxlength="50" required>
+                                    <label for="address">Address</label>
+                                </div>
+                                <br>
+                                <button type="submit" class="btn btn-primary">Submit</button>
+                            </form>
+
+                        </div>
+                    </div>
+                </div>
+                <!--fin main content-->
+            </div>
+        </div>
+    </div>
+</div>
+<div id="listaIds" data-ids="{{ ids }}"></div>
+<script>
+    $(document).ready(function () {
+        var listaIds = JSON.parse(document.getElementById('listaIds').dataset.ids);
+        $('#id').on('input', function () {
+            var id = parseInt($(this).val());
+            if (listaIds.includes(id)) {
+                $('#repeatedMessage').text('¡El ID ya está repetido!');
+            } else {
+                $('#repeatedMessage').text('');
+            }
+        });
+    });
+</script>
+
+
+<!-- Bootstrap JS -->
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+{%endblock%}

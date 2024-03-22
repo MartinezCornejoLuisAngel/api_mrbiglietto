@@ -10,7 +10,7 @@ class ModelUser():
     def login(self,user):
         try:
             payload = {'user':user.username,'password':user.password}
-            response = requests.post(config('URL_BASE_BD')+'/adminapi/v1/AdminUser/login',json=payload)
+            response = requests.post(config('URL_BASE_BD')+'/webadminapi/v1/AdminUser/login',json=payload)
             return response  
         except Exception as ex:
             raise Exception(ex)

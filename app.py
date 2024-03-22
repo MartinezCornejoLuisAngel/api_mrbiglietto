@@ -10,12 +10,20 @@ import random
 import string
 from flask_cors import CORS
 import re
+import json,ast
 import requests
 from web3.middleware import construct_sign_and_send_raw_middleware
 from config import d_config
 from flask_wtf.csrf import CSRFProtect
 from models.ModelUser import ModelUser
 from models.entities.User import User
+from models.ModelArtist import ModelArtist
+from models.entities.Artist import Artist
+from models.ModelLocation import ModelLocation
+from models.entities.Location import Location
+from models.entities.Section import Section
+from models.ModelTheater import ModelTheater
+from models.entities.Theater import Theater
 
 
 # Conexión a la red de Ethereum (en este caso, una red de prueba)
@@ -527,11 +535,11 @@ def login():
   if request.method == 'POST':
     username = request.form['username']
     password = request.form['password']
-    #print(username)
-    #print(password)
     user = User(1,username,password) 
     logged_user  = ModelUser.login(user)
     if logged_user.status_code == 200:
+      data = json.loads(logged_user.text)
+      user.setUserId(data['name'])
       login_user(user)
       return redirect(url_for('home'))
     else:
@@ -550,17 +558,136 @@ def logout():
 def home():
   return render_template('/home.html')
 
-@app.route('/protected')
+@app.route('/register_theater',methods=['GET','POST'])
 @login_required
-def protected():
-  return "<h1>Esta es una vista protegida, solo para usuario autenticados</h1>"
+def register_theater():
+  if request.method == 'POST':
+    form_data = request.form.to_dict()
+    name_theater = form_data['nameTheather']
+    locations = form_data['options']
+    locations_dict = eval(locations)
+    id_location = locations_dict['idLocation']
+    aux_dict = form_data
+    del aux_dict['nameTheather']
+    del aux_dict['options']
+    sections = []
+    section_index = 1
+    while True:
+      section_key = f"section_name_{section_index}"
+      if section_key not in aux_dict:
+        break
+    
+      section_name = aux_dict.get(section_key)
+      num_columns = aux_dict.get(f"num_columns_{section_index}")
+      num_rows = aux_dict.get(f"num_rows_{section_index}")
+      seats_ave = aux_dict.get(f"seats_ave_{section_index}")
+
+      if section_name is None or num_columns is None or num_rows is None or seats_ave is None:
+        break
+      is_general = True
+      section = Section(section_name, num_columns, num_rows,is_general, seats_ave)
+      sections.append(section)
+    
+      section_index += 1
+
+    theater = Theater(name_theater,id_location,sections)
+    response = ModelTheater.register_theater(theater)
+    if response.status_code == 200:
+      flash("Teatro registrado correctamente")
+      return send_register_theater_view()
+    elif response.status_code == 409:
+      flash("Error con el id")
+      return send_register_theater_view() 
+    elif response.status_code == 400:
+      flash("Error en la base de datos")
+      return send_register_theater_view()
+    else:
+      flash("Server error")
+      return send_register_theater_view()
+  else:
+    return send_register_theater_view()
+
+def send_register_theater_view():
+  response = ModelLocation.get_locations()
+  locations = response.json() 
+  opciones = []
+  for location in locations:     
+    opciones.append(location)  
+  return render_template('/register_theater.html',lista=opciones)
+
+
+@app.route('/register_artist',methods=['GET','POST'])
+@login_required
+def register_artist():
+  if request.method == 'POST':
+    artistName = request.form['artistName']
+    artistDescription = request.form['artistDescription']
+    artistGenre = request.form['artistGenre']
+    artistUrl = request.form['artistUrl']
+    artistTourName = request.form['artistTourName']
+    artist = Artist(artistName,
+                  artistDescription,
+                  artistGenre,
+                  artistUrl,
+                  artistTourName)
+    response = ModelArtist.register_artist(artist)
+    if response.status_code == 200:
+      flash("Artista registrado correctamente")
+      return render_template('/register_artist.html')
+    elif response.status_code == 400:
+      flash("Error" + response.text['title'])
+      return render_template('/register_artist.html')
+    else:
+      flash("Something went wrong ...")
+      return render_template('/register_artist.html')
+  else:
+    return render_template('/register_artist.html')
+
+@app.route('/register_location',methods=['GET','POST'])
+@login_required
+def register_location():
+  if request.method == 'POST':
+    id = request.form['id']
+    country = request.form['country']
+    state = request.form['state']
+    city = request.form['city']
+    colony = request.form['colony']
+    postal_code = request.form['postal_code']
+    address = request.form['address']
+    location = Location(id,country,state,city,colony,postal_code,address)
+    response = ModelLocation.register_location(location)
+    if response.status_code == 200:
+      flash("Ubicacion registrado correctamente")
+      return render_template('/register_location.html')
+    elif response.status_code == 409:
+      flash("Error con el id")
+      return render_template('/register_location.html')
+    elif response.status_code == 400:
+      flash("Error en la base de datos")
+      return render_template('/register_location.html')
+    else:
+      flash("Server error")
+      return render_template('/register_location.html')
+  else:
+    response = ModelLocation.get_locations()
+    locations = response.json() 
+    ids = []
+    for location in locations:     
+      ids.append(location['idLocation'])  
+    return render_template('/register_location.html',ids=ids)
 
 def status_401(error):
   return redirect(url_for('login'))
 
 def status_404(errror):
-  return "<h1>Página no encontrada</h1>",404
+  return render_template('/error_404.html')
 
+# Manejador de errores para excepciones no manejadas
+#@app.errorhandler(Exception)
+#def handle_unhandled_exception(e):
+#  flash("Error en servidor...")
+#  return redirect(url_for('home'))
+ 
 app.register_error_handler(401,status_401)
 app.register_error_handler(404,status_404)
 

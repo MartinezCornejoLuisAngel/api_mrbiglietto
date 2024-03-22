@@ -1,0 +1,86 @@
+{%extends './base_registros.html' %}
+
+{%block title%}Teatro{%endblock%}
+
+{%block customCss%}
+
+<link rel="stylesheet" href="{{url_for('static',filename='css/home.css')}}">
+<style>
+    .section-container {
+        margin-bottom: 20px;
+    }
+</style>
+{%endblock%}
+
+
+{%block body%}
+<div class="container-fluid">
+    <div class="row">
+        <!-- Sidebar -->
+        <div class="container-fluid">
+            <div class="row">
+                <!-- Main Content -->
+                <div class="col-md-9 main-content">
+                    <div class="card">
+                        <div class="card-body">
+
+
+                            <h2 class="card-title text-center">Registrar Teatro</h2>
+
+                            <!-- Aquí va tu formulario o cualquier otro contenido principal -->
+                            <form id="sectionForm" class="form-signin" action="/register_theater" method="POST">
+                                {% with messages = get_flashed_messages() %}
+                                {% if messages%}
+                                <br />
+                                {% for message in messages %}
+                                <div class="alert alert-primary alert-dismissible" role="alert">
+                                    <strong>{{message}}</strong>
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert"
+                                        aria-label="Close"></button>
+
+                                </div>
+                                {% endfor %}
+                                {% endif%}
+                                {% endwith %}
+                                <div class="form-floating">
+                                    <input type="text" class="form-control" id="nameTheather" name="nameTheather"
+                                        placeholder="Name theater" maxlength="30" required>
+                                    <label for="nameTheather">Name theater</label>
+                                </div>
+                                <br>
+
+                                <div class="form-floating">
+                                    <select class="form-control" id="options" name="options" required>
+                                        {% for opcion in lista %}
+                                        <option value="{{ opcion|safe }}">{{ opcion }}</option>
+                                        {% endfor %}
+                                    </select>
+                                    <label for="options">Options</label>
+                                </div>
+                                <br>
+
+                                <div id="sectionFields"> </div> <!-- Contenedor para los campos de la sección -->
+                                <br>
+                                <button type="button" class="btn btn-primary" onclick="addSectionFields()">Agregar
+                                    Sección</button>
+                                <button type="submit" class="btn btn-primary">Enviar</button>
+                            </form>
+
+                            <!-- Script para manejar la lógica de agregar los campos de la sección -->
+
+                            <script src="{{url_for('static',filename='script/register_theater.js')}}"></script>
+
+                        </div>
+                    </div>
+                </div>
+                <!--fin main content-->
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Bootstrap JS -->
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+{%endblock%}
