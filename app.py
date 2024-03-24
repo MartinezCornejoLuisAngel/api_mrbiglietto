@@ -727,7 +727,7 @@ def pub_task():
         id_ticket = request.json['id_client']
         
         try:
-            message = f"POST {config('URL_BASE_BC1')}/create_ticket {id_event} {id_client} {id_ticket}"
+            message = f"POST {config('URL_BASE_BC')}/create_ticket {id_event} {id_client} {id_ticket}"
             pub = Publisher()
             pub.pub_task(message)
             return jsonify({"message": "Task published successfully"}), 200
