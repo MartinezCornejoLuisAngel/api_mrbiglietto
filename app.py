@@ -24,7 +24,7 @@ from models.entities.Location import Location
 from models.entities.Section import Section
 from models.ModelTheater import ModelTheater
 from models.entities.Theater import Theater
-
+from models.pub_api import Publisher
 
 # Conexión a la red de Ethereum (en este caso, una red de prueba)
 web3 = Web3(Web3.HTTPProvider(config('INFURA_NODE')))
@@ -558,7 +558,7 @@ def send_email_help():
   
   try:
     send_email_help_to(email_user,email_help,message)
-    return jsonify({'status': 'success'}),20
+    return jsonify({'status': 'success'}),200
   except Exception as e:
     return jsonify({'error':str(e)}), 500
   
@@ -714,6 +714,28 @@ def register_location():
     for location in locations:     
       ids.append(location['idLocation'])  
     return render_template('/register_location.html',ids=ids)
+
+#PUB SUB///////////////////////////////////////////////////////////////////////////////////////////
+@app.route('/pub_task', methods=['GET','POST'])
+def pub_task():
+    if request.method == 'POST':
+        if not request.json or 'id_event' not in request.json or 'id_client' not in request.json or 'id_ticket' not in request.json:
+            return jsonify({'error':'Missing parameters'}), 400
+        
+        id_event = request.json['id_event']
+        id_client = request.json['id_client']
+        id_ticket = request.json['id_client']
+        
+        try:
+            message = f"POST {config('URL_BASE_BC1')}/create_ticket {id_event} {id_client} {id_ticket}"
+            pub = Publisher()
+            pub.pub_task(message)
+            return jsonify({"message": "Task published successfully"}), 200
+        except Exception as ex:
+                raise Exception(ex)
+    else:
+        return "<h1>Get</h1>"
+
 
 def status_401(error):
   return redirect(url_for('login'))
