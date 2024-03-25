@@ -719,15 +719,18 @@ def register_location():
 @app.route('/pub_task', methods=['GET','POST'])
 def pub_task():
     if request.method == 'POST':
-        if not request.json or 'id_event' not in request.json or 'id_client' not in request.json or 'id_ticket' not in request.json:
+        if not request.json or 'id_event' not in request.json or 'id_client' not in request.json or 'id_ticket' not in request.json or 'email' not in request.json or 'username' not in request.json or 'event_name' not in request.json:
             return jsonify({'error':'Missing parameters'}), 400
         
         id_event = request.json['id_event']
         id_client = request.json['id_client']
         id_ticket = request.json['id_client']
+        email = request.json['email']
+        username = request.json['username']
+        event_name = request.json['event_name']
         
         try:
-            message = f"POST {config('URL_BASE_BC')}/create_ticket {id_event} {id_client} {id_ticket}"
+            message = f"POST {config('URL_BASE_BC')}/create_ticket {id_event} {id_client} {id_ticket} {email} {username} {event_name}"
             pub = Publisher()
             pub.pub_task(message)
             return jsonify({"message": "Task published successfully"}), 200
