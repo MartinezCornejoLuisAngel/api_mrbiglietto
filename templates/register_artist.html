@@ -3,9 +3,52 @@
 {%block title%}Artista{%endblock%}
 
 {%block customCss%}
+<script src="https://www.gstatic.com/firebasejs/7.17.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/7.17.1/firebase-storage.js"></script>
 <link rel="stylesheet" href="{{url_for('static',filename='css/home.css')}}">
+<style>
+    /* Estilos para el loader */
+    .loader {
+        display: none;
+        position: absolute;
+        /* Cambiado a posición absoluta */
+        top: 50%;
+        /* Centrado verticalmente */
+        left: 50%;
+        /* Centrado horizontalmente */
+        transform: translate(-50%, -50%);
+        border: 4px solid #f3f3f3;
+        border-top: 4px solid #3498db;
+        border-radius: 50%;
+        width: 50px;
+        height: 50px;
+        animation: spin 1s linear infinite;
+        z-index: 1;
+        /* Asegura que el loader esté en la parte superior */
+    }
+
+    @keyframes spin {
+        0% {
+            transform: rotate(0deg);
+        }
+
+        100% {
+            transform: rotate(360deg);
+        }
+    }
+
+    Con .form-group {
+        display: flex;
+        align-items: center;
+    }
+
+    .form-group button {
+        margin-left: 10px;
+    }
+</style>
 {%endblock%}
 {%block body%}
+
 <div class="container-fluid">
     <div class="row">
         <!-- Sidebar -->
@@ -17,7 +60,7 @@
                         <div class="card-body">
                             <h2 class="card-title text-center">Registrar Artista</h2>
                             <!-- Aquí va tu formulario o cualquier otro contenido principal -->
-                           
+
                             <form class="form-signin" action="/register_artist" method="POST">
                                 {% with messages = get_flashed_messages() %}
                                 {% if messages%}
@@ -27,33 +70,49 @@
                                     <strong>{{message}}</strong>
                                     <button type="button" class="btn-close" data-bs-dismiss="alert"
                                         aria-label="Close"></button>
-    
+
                                 </div>
                                 {% endfor %}
                                 {% endif%}
                                 {% endwith %}
                                 <div class="form-floating">
-                                    <input type="text" class="form-control" id="artistName" name="artistName" placeholder="Artist name" maxlength="50" required>
+                                    <input type="text" class="form-control" id="artistName" name="artistName"
+                                        placeholder="Artist name" maxlength="50" required>
                                     <label for="artistName">Artist name</label>
                                 </div>
                                 <br>
                                 <div class="form-floating">
-                                    <textarea type="text" class="form-control" id="artistDescription" name="artistDescription" placeholder="Description"required></textarea>
+                                    <textarea type="text" class="form-control" id="artistDescription"
+                                        name="artistDescription" placeholder="Description" required></textarea>
                                     <label for="artistDescription">Description</label>
                                 </div>
                                 <br>
                                 <div class="form-floating">
-                                    <input type="text" class="form-control" id="artistGenre" name="artistGenre" placeholder="Genre" maxlength="30" required>
+                                    <input type="text" class="form-control" id="artistGenre" name="artistGenre"
+                                        placeholder="Genre" maxlength="30" required>
                                     <label for="artistGenre">Genre</label>
                                 </div>
                                 <br>
                                 <div class="form-floating">
-                                    <input type="text" class="form-control" id="artistUrl" name="artistUrl" placeholder="URL" required>
+                                    <input type="file" class="form-control" id="artistImage" accept="image/*" required>
+                                    <label for="artistImage">Seleccionar Imagen</label>
+                                </div>
+                                <br>
+                                <div class="loader" id="loader">Cargando...</div>
+
+                                <button class="btn btn-secondary" type="button" onclick="uploadImage()">Subir
+                                    Imagen</button>
+                                <br>
+                                <br>
+                                <div class="form-floating">
+                                    <input type="text" class="form-control" id="artistUrl" name="artistUrl"
+                                        placeholder="URL" required>
                                     <label for="artistUrl">URL</label>
                                 </div>
                                 <br>
                                 <div class="form-floating">
-                                    <input type="text" class="form-control" id="artistTourName" name="artistTourName" placeholder="TOUR NAME" maxlength="200" required>
+                                    <input type="text" class="form-control" id="artistTourName" name="artistTourName"
+                                        placeholder="TOUR NAME" maxlength="200" required>
                                     <label for="artistTourName">Tour name</label>
                                 </div>
                                 <br>
@@ -72,5 +131,5 @@
 <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-
+<script src="{{url_for('static',filename='script/register_artist.js')}}"  data-firebase-config='{{ firebase_config | tojson | safe }}'></script>
 {%endblock%}

@@ -3,9 +3,49 @@
 {%block title%}Teatro{%endblock%}
 
 {%block customCss%}
+<script src="https://www.gstatic.com/firebasejs/7.17.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/7.17.1/firebase-storage.js"></script>
 
 <link rel="stylesheet" href="{{url_for('static',filename='css/home.css')}}">
 <style>
+    .loader {
+        display: none;
+        position: absolute;
+        /* Cambiado a posición absoluta */
+        top: 50%;
+        /* Centrado verticalmente */
+        left: 50%;
+        /* Centrado horizontalmente */
+        transform: translate(-50%, -50%);
+        border: 4px solid #f3f3f3;
+        border-top: 4px solid #3498db;
+        border-radius: 50%;
+        width: 50px;
+        height: 50px;
+        animation: spin 1s linear infinite;
+        z-index: 1;
+        /* Asegura que el loader esté en la parte superior */
+    }
+
+    @keyframes spin {
+        0% {
+            transform: rotate(0deg);
+        }
+
+        100% {
+            transform: rotate(360deg);
+        }
+    }
+
+    Con .form-group {
+        display: flex;
+        align-items: center;
+    }
+
+    .form-group button {
+        margin-left: 10px;
+    }
+
     .section-container {
         margin-bottom: 20px;
     }
@@ -58,17 +98,30 @@
                                     <label for="options">Options</label>
                                 </div>
                                 <br>
+                                <div class="form-floating">
+                                    <input type="file" class="form-control" id="theaterImage" accept="image/*" required>
+                                    <label for="theaterImage">Seleccionar Imagen</label>
+                                </div>
+                                <br>
+                                <div class="loader" id="loader_t">Cargando...</div>
 
+                                <button class="btn btn-secondary" type="button" onclick="uploadImage()">Subir
+                                    Imagen</button>
+                                <br>
+                                <br>
+                                <div class="form-floating">
+                                    <input type="text" class="form-control" id="theaterUrl" name="theaterUrl"
+                                        placeholder="URL" required>
+                                    <label for="theaterUrl">URL</label>
+                                </div>
+                                <br>
                                 <div id="sectionFields"> </div> <!-- Contenedor para los campos de la sección -->
                                 <br>
                                 <button type="button" class="btn btn-primary" onclick="addSectionFields()">Agregar
                                     Sección</button>
                                 <button type="submit" class="btn btn-primary">Enviar</button>
                             </form>
-
-                            <!-- Script para manejar la lógica de agregar los campos de la sección -->
-
-                            <script src="{{url_for('static',filename='script/register_theater.js')}}"></script>
+                            <script src="{{url_for('static', filename='script/register_theater.js')}}"  data-firebase-config='{{ firebase_config | tojson | safe }}'></script>
 
                         </div>
                     </div>
@@ -82,5 +135,6 @@
 <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
 
 {%endblock%}

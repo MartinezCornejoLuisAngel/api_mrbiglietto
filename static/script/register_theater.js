@@ -1,6 +1,9 @@
-src="https://code.jquery.com/jquery-3.6.0.min.js"
-
+src = "https://code.jquery.com/jquery-3.6.0.min.js";
 let sectionCounter = 1;
+const firebaseConfig = JSON.parse(document.currentScript.getAttribute('data-firebase-config'));
+// Utiliza firebaseConfig aquí
+firebase.initializeApp(firebaseConfig);
+
 
 function addSectionFields() {
   var sectionFieldsContainer = document.getElementById("sectionFields");
@@ -58,30 +61,72 @@ function addSectionFields() {
   sectionCounter++;
 }
 
+
 // Manejar el envío del formulario
-$(document).ready(function() {
-    $('#sectionForm').on('submit', function(event) {
-        event.preventDefault(); // Evitar el envío del formulario de forma predeterminada
+$(document).ready(function () {
+  $("#sectionForm").on("submit", function (event) {
+    event.preventDefault(); // Evitar el envío del formulario de forma predeterminada
 
-        // Serializar los datos del formulario
-        var formData = $(this).serialize();
+    // Serializar los datos del formulario
+    var formData = $(this).serialize();
 
-        // Enviar los datos al servidor usando AJAX
-        $.ajax({
-            type: 'POST',
-            url: '/register_theater',
-            data: formData,
-            success: function(response) {
-                if (response.status_code == 200) {
-                    alert("Teatro registrado correctamente");
-                    window.location.href = '/register_location'; // Redirigir al usuario
-                } else if (response.status_code == 409) {
-                    alert("Error con el id");
-                }
-            },
-            error: function(xhr, status, error) {
-                console.error("Error al enviar los datos de las secciones:", error);
-            }
-        });
+    // Enviar los datos al servidor usando AJAX
+    $.ajax({
+      type: "POST",
+      url: "/register_theater",
+      data: formData,
+      success: function (response) {
+        if (response.status_code == 200) {
+          alert("Teatro registrado correctamente");
+          window.location.href = "/register_location"; // Redirigir al usuario
+        } else if (response.status_code == 409) {
+          alert("Error con el id");
+        }
+      },
+      error: function (xhr, status, error) {
+        console.error("Error al enviar los datos de las secciones:", error);
+      },
     });
+  });
 });
+
+
+function uploadImage() {
+  const file = document.getElementById("theaterImage").files[0];
+  const storageRef = firebase.storage().ref();
+  const imageRef = storageRef.child("theater_images/" + file.name);
+
+  // Mostrar el loader
+  document.getElementById("loader_t").style.display = "block";
+
+  if (file == null) {
+    alert("Selecciona una imagen");
+    // Ocultar el loader
+    document.getElementById("loader_t").style.display = "none";
+  } else {
+    imageRef
+      .put(file)
+      .then((snapshot) => {
+        console.log("Imagen cargada exitosamente");
+        // Obtener la URL de la imagen cargada
+        imageRef
+          .getDownloadURL()
+          .then((url) => {
+            // Colocar la URL en el campo de entrada de URL
+            document.getElementById("theaterUrl").value = url;
+            // Ocultar el loader
+            document.getElementById("loader_t").style.display = "none";
+          })
+          .catch((error) => {
+            console.error("Error al obtener la URL de la imagen:", error);
+            // Ocultar el loader
+            document.getElementById("loader_t").style.display = "none";
+          });
+      })
+      .catch((error) => {
+        console.error("Error al cargar la imagen:", error);
+        // Ocultar el loader
+        document.getElementById("loader_t").style.display = "none";
+      });
+  }
+}
