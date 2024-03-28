@@ -22,10 +22,25 @@ function validateForm() {
   document.getElementById("eventForm").submit();
 }
 
-const firebaseConfig = JSON.parse(document.currentScript.getAttribute('data-firebase-config'));
-// Utiliza firebaseConfig aquí
-firebase.initializeApp(firebaseConfig);
+// register_theater.js
 
+document.addEventListener("DOMContentLoaded", function () {
+  fetch("/firebase-config")
+    .then((response) => response.json())
+    .then((data) => {
+      // Utiliza la configuración de Firebase recibida
+      initializeFirebase(data);
+    })
+    .catch((error) => {
+      console.error("Error al obtener la configuración de Firebase:", error);
+    });
+});
+
+function initializeFirebase(config) {
+  // Inicializa Firebase con la configuración proporcionada
+  firebase.initializeApp(config);
+  // Aquí puedes seguir con la inicialización de Firebase
+}
 
 function uploadImage() {
   const file = document.getElementById("artistImage").files[0];
@@ -66,4 +81,3 @@ function uploadImage() {
       });
   }
 }
-
