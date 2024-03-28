@@ -577,6 +577,55 @@ def send_email_help():
     return jsonify({'status': 'success'}),200
   except Exception as e:
     return jsonify({'error':str(e)}), 500
+
+def send_email_refund_to(email,id_refund,message):
+  # Configuración del servidor SMTP
+    servidor_smtp = config('SERVIDOR_SMPT')
+    puerto_smtp = config('PUERTO_SMPT')
+    remitente = config('CORREO_REMITENTE')
+    contraseña = config('PASSWORD_GMAIL')
+
+    # Crear el mensaje
+    mensaje = MIMEMultipart("alternative")
+    mensaje['From'] = remitente
+    mensaje['To'] = email
+    mensaje['Subject'] = "Respuesta de devolucion"
+
+    cuerpo_mensaje = render_template('email_refund.html',id_refund=id_refund, message = message)
+    # Adjuntar parte del mensaje
+    mensaje.attach(MIMEText(cuerpo_mensaje, "html"))
+
+	# Iniciar sesión en el servidor SMTP y enviar el mensaje
+    with smtplib.SMTP(servidor_smtp, puerto_smtp) as servidor:
+        servidor.starttls()
+        servidor.login(remitente, contraseña)
+        servidor.send_message(mensaje)
+
+@app.route('/api/v1/send_email_refund',methods=['POST'])
+def send_email_refund():
+  if not request.json or 'email' not in request.json or 'status' not in request.json or 'id_refund' not in request.json:
+    return jsonify({'error':'Missing parameters'}), 400
+  
+  email = request.json['email']
+  status = request.json['status']
+  id_refund = request.json['id_refund']
+  message = ""
+  if status == 1:
+    message = "Ha sido aprobado"
+  elif status == 0:
+    message = "Ha sido rechazado"
+  elif status == -1:
+    message = "Has cancelado la devolucion"
+  else:
+    return jsonify({'error':'Status out of range'}),500
+    
+  
+  try:
+    send_email_refund_to(email,id_refund,message)
+    return jsonify({'status': 'success'}),200
+  except Exception as e:
+    return jsonify({'error':str(e)}), 500
+  
   
 
 #/////////////////////////////////Página web////////////////////
