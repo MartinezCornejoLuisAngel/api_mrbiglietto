@@ -211,18 +211,17 @@ def load_user(username):
 
 #/////////////////////////////////////////////////////////
 
-
-
-firebase_config = {
-  'apiKey': config('FIREBASE_API_KEY'),
-  'authDomain': config('FIREBASE_AUTH_DOMAIN'),
-  'projectId': config('FIREBASE_PROJECT_ID'),
-  'storageBucket': config('FIREBASE_STORAGE_BUCKET'),
-  'messagingSenderId': config('FIREBASE_MESSAGING_SENDER_ID'),
-  'appId': config('FIREBASE_APP_ID')
-}
-
-
+@app.route('/firebase-config')
+def get_firebase_config():
+    firebase_config = {
+        'apiKey': config('FIREBASE_API_KEY'),
+        'authDomain': config('FIREBASE_AUTH_DOMAIN'),
+        'projectId': config('FIREBASE_PROJECT_ID'),
+        'storageBucket': config('FIREBASE_STORAGE_BUCKET'),
+        'messagingSenderId': config('FIREBASE_MESSAGING_SENDER_ID'),
+        'appId': config('FIREBASE_APP_ID')
+    }
+    return jsonify(firebase_config)
 
 #///////////////////////////////////////////////////////////
 
@@ -672,7 +671,7 @@ def send_register_theater_view():
   opciones = []
   for location in locations:     
     opciones.append(location)  
-  return render_template('/register_theater.html',lista=opciones, firebase_config=firebase_config)
+  return render_template('/register_theater.html',lista=opciones)
 
 
 @app.route('/register_artist',methods=['GET','POST'])
@@ -692,15 +691,15 @@ def register_artist():
     response = ModelArtist.register_artist(artist)
     if response.status_code == 200:
       flash("Artista registrado correctamente")
-      return render_template('/register_artist.html', firebase_config=firebase_config)
+      return render_template('/register_artist.html')
     elif response.status_code == 400:
       flash("Error" + response.text['title'])
-      return render_template('/register_artist.html', firebase_config=firebase_config)
+      return render_template('/register_artist.html')
     else:
       flash("Something went wrong ...")
-      return render_template('/register_artist.html', firebase_config=firebase_config)
+      return render_template('/register_artist.html')
   else:
-    return render_template('/register_artist.html', firebase_config=firebase_config)
+    return render_template('/register_artist.html')
 
 @app.route('/register_location',methods=['GET','POST'])
 @login_required

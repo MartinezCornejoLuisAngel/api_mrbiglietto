@@ -1,9 +1,22 @@
 src = "https://code.jquery.com/jquery-3.6.0.min.js";
 let sectionCounter = 1;
-const firebaseConfig = JSON.parse(document.currentScript.getAttribute('data-firebase-config'));
-// Utiliza firebaseConfig aquí
-firebase.initializeApp(firebaseConfig);
+document.addEventListener("DOMContentLoaded", function () {
+  fetch("/firebase-config")
+    .then((response) => response.json())
+    .then((data) => {
+      // Utiliza la configuración de Firebase recibida
+      initializeFirebase(data);
+    })
+    .catch((error) => {
+      console.error("Error al obtener la configuración de Firebase:", error);
+    });
+});
 
+function initializeFirebase(config) {
+  // Inicializa Firebase con la configuración proporcionada
+  firebase.initializeApp(config);
+  // Aquí puedes seguir con la inicialización de Firebase
+}
 
 function addSectionFields() {
   var sectionFieldsContainer = document.getElementById("sectionFields");
