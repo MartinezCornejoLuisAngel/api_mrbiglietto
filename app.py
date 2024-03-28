@@ -209,6 +209,23 @@ login_manager_app = LoginManager(app)
 def load_user(username):
   return ModelUser.get_by_username(username)
 
+#/////////////////////////////////////////////////////////
+
+
+
+firebase_config = {
+  'apiKey': config('FIREBASE_API_KEY'),
+  'authDomain': config('FIREBASE_AUTH_DOMAIN'),
+  'projectId': config('FIREBASE_PROJECT_ID'),
+  'storageBucket': config('FIREBASE_STORAGE_BUCKET'),
+  'messagingSenderId': config('FIREBASE_MESSAGING_SENDER_ID'),
+  'appId': config('FIREBASE_APP_ID')
+}
+
+
+
+#///////////////////////////////////////////////////////////
+
 
 @app.route('/check')
 def check_conn():
@@ -603,12 +620,14 @@ def register_theater():
   if request.method == 'POST':
     form_data = request.form.to_dict()
     name_theater = form_data['nameTheather']
+    theater_url = form_data['theaterUrl']
     locations = form_data['options']
     locations_dict = eval(locations)
     id_location = locations_dict['idLocation']
     aux_dict = form_data
     del aux_dict['nameTheather']
     del aux_dict['options']
+    del aux_dict['theaterUrl']
     sections = []
     section_index = 1
     while True:
@@ -629,8 +648,9 @@ def register_theater():
     
       section_index += 1
 
-    theater = Theater(name_theater,id_location,sections)
+    theater = Theater(name_theater,id_location,sections,theater_url)
     response = ModelTheater.register_theater(theater)
+    print(response)
     if response.status_code == 200:
       flash("Teatro registrado correctamente")
       return send_register_theater_view()
@@ -652,7 +672,7 @@ def send_register_theater_view():
   opciones = []
   for location in locations:     
     opciones.append(location)  
-  return render_template('/register_theater.html',lista=opciones)
+  return render_template('/register_theater.html',lista=opciones, firebase_config=firebase_config)
 
 
 @app.route('/register_artist',methods=['GET','POST'])
@@ -672,15 +692,15 @@ def register_artist():
     response = ModelArtist.register_artist(artist)
     if response.status_code == 200:
       flash("Artista registrado correctamente")
-      return render_template('/register_artist.html')
+      return render_template('/register_artist.html', firebase_config=firebase_config)
     elif response.status_code == 400:
       flash("Error" + response.text['title'])
-      return render_template('/register_artist.html')
+      return render_template('/register_artist.html', firebase_config=firebase_config)
     else:
       flash("Something went wrong ...")
-      return render_template('/register_artist.html')
+      return render_template('/register_artist.html', firebase_config=firebase_config)
   else:
-    return render_template('/register_artist.html')
+    return render_template('/register_artist.html', firebase_config=firebase_config)
 
 @app.route('/register_location',methods=['GET','POST'])
 @login_required

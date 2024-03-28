@@ -12,15 +12,15 @@ class ModelTheater():
             for section in theater.sections:
                 serilized_sections.append({
                     'sectionName':section.name,
-                    'columnsNumber':section.columns_number,
-                    'rowsNumber' : section.rows_number,
+                    'columnsNumber':int(section.columns_number),
+                    'rowsNumber' : int(section.rows_number),
                     'isGeneral' : section.general,
-                    'availableSeats':section.available_seats
+                    'availableSeats':int(section.available_seats)
                 })
-            
             payload = {'theaterName':theater.name,
                     'idLocation':theater.id_location,
-                    'sections': serilized_sections
+                    'sections': serilized_sections,
+                    'urlGrid':theater.theater_url
                     }
             response = requests.post(config('URL_BASE_BD')+'/webadminapi/v1/Theater',json=payload)
             return response  
