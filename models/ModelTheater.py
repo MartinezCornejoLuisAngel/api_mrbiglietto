@@ -26,3 +26,11 @@ class ModelTheater():
             return response  
         except Exception as ex:
             raise Exception(ex)
+        
+    @classmethod
+    def get_theaters(self):
+        try:
+            response = requests.get(config('URL_BASE_BD')+'/webadminapi/v1/Theater')
+            return response
+        except Exception as ex:
+            raise Exception(ex)

@@ -8,39 +8,72 @@
 
 
 {%block body%}
+<div class="container-fluid">
+  <div class="row">
+    <!-- Sidebar -->
     <div class="container-fluid">
-        <div class="row">
-          <!-- Sidebar -->
-          <div class="container-fluid">
-            <div class="row">        
-              <!-- Main Content -->
-              <div class="col-md-9 main-content">
-                <div class="card">
-                  <div class="card-body">
-                            <h2 class="card-title text-center">Registrar Evento</h2>
-                        <!-- Aquí va tu formulario o cualquier otro contenido principal -->
-                        <form>
-                            <div class="form-group">
-                                <label for="exampleFormControlInput1">Nombre del Evento</label>
-                                <input type="text" class="form-control" id="exampleFormControlInput" placeholder="Nombre del evento">
-                            </div>
-                            <div class="form-group">
-                                <label for="exampleFormControlDate">Select a Date</label>
-                                <input type="date" class="form-control" id="exampleFormControlDate">
-                            </div>
-                            <button type="submit" class="btn btn-primary">Submit</button>
-                        </form>
-                        </div>
-                    </div>
+      <div class="row">
+        <!-- Main Content -->
+        <div class="col-md-9 main-content">
+          <div class="card">
+            <div class="card-body">
+              <h2 class="card-title text-center">Registrar Evento</h2>
+              <!-- Aquí va tu formulario o cualquier otro contenido principal -->
+              <form id="sectionForm" class="form-signin" action="/home" method="POST">
+                {% with messages = get_flashed_messages() %}
+                {% if messages%}
+                <br />
+                {% for message in messages %}
+                <div class="alert alert-primary alert-dismissible" role="alert">
+                  <strong>{{message}}</strong>
+                  <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+
                 </div>
-            <!--fin main content-->
+                {% endfor %}
+                {% endif%}
+                {% endwith %}
+                <div class="form-floating">
+                  <select class="form-control" id="artists" name="artists" required>
+                    {% for a in artists %}
+                    <option value="{{ a|safe }}">{{ a }}</option>
+                    {% endfor %}
+                  </select>
+                  <label for="artists">Artists</label>
                 </div>
-              </div>
+                <br>
+                <div class="form-floating">
+                  <select class="form-control" id="theaters" name="theaters" required>
+                    {% for t in theaters %}
+                    <option value="{{ t|safe }}">{{ t }}</option>
+                    {% endfor %}
+                  </select>
+                  <label for="theaters">Theaters</label>
+                </div>
+                <br>
+                <div class="form-group">
+                  <label for="exampleFormControlDateTime">Select a Date and Time</label>
+                  <input name="fecha_y_hora" type="datetime-local" class="form-control" id="exampleFormControlDateTime"
+                    required>
+                </div>
+                <br>
+                <div id="sectionCardsContainer" class="row mt-4"></div>
+
+                <br>
+                <button type="submit" class="btn btn-primary">Submit</button>
+              </form>
+              <script src="{{url_for('static',filename='script/register_event.js')}}"></script>
+
             </div>
           </div>
-      <!-- Bootstrap JS -->
-      <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-      <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
-      <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-    
+        </div>
+        <!--fin main content-->
+      </div>
+    </div>
+  </div>
+</div>
+<!-- Bootstrap JS -->
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
 {%endblock%}
