@@ -1,7 +1,6 @@
 from flask import Flask, request, jsonify, render_template, redirect , url_for,flash
 from flask_login import LoginManager,login_user, logout_user, login_required
-from web3 import Web3, HTTPProvider
-from solcx import compile_source
+from web3 import Web3
 from decouple import config
 import smtplib
 from email.mime.text import MIMEText
@@ -10,7 +9,7 @@ import random
 import string
 from flask_cors import CORS
 import re
-import json,ast
+import json
 import requests
 from web3.middleware import construct_sign_and_send_raw_middleware
 from config import d_config
@@ -25,6 +24,8 @@ from models.entities.Section import Section
 from models.ModelTheater import ModelTheater
 from models.entities.Theater import Theater
 from models.pub_api import Publisher
+from models.ModelEvent import ModelEvent
+from models.entities.Event import Event
 
 # Conexión a la red de Ethereum (en este caso, una red de prueba)
 web3 = Web3(Web3.HTTPProvider(config('INFURA_NODE')))
@@ -657,10 +658,58 @@ def logout():
   logout_user()
   return redirect(url_for('login'))
 
-@app.route('/home')
+@app.route('/home',methods=['GET','POST'])
 @login_required
 def home():
-  return render_template('/home.html')
+  if request.method == 'POST':
+    form_data = request.form.to_dict()
+    artist = form_data['artists']
+    artist_json = artist.replace("'",'"')
+    artist_dict = json.loads(artist_json)
+    id_artist = artist_dict['idArtist']
+    theater = form_data['theaters']
+    theater_json = theater.replace("'",'"')
+    theater_json = theater_json.replace("None","0")
+    theater_json = theater_json.replace("False","false")
+    theater_dict = json.loads(theater_json)
+    id_theater = theater_dict['idTheater']
+    date_hour = form_data['fecha_y_hora'] + ":00"
+    section_list = []
+    sections = theater_dict['sections']
+    for s in sections:
+      id_section = s['idSection']
+      available_seats = s['availableSeats']
+      price = form_data[f"precio{id_section}"]
+      section = Section(id_section,available_seats,price)
+      section_list.append(section)       
+    
+    event = Event(id_artist,id_theater,date_hour,section_list)
+    response = ModelEvent.register_event(event)
+    if response.status_code == 200:
+      flash("Evento registrado correctamente")
+      return set_events_view()
+    elif response.status_code == 401:
+      flash("Bad Request")
+      return set_events_view()
+    else:
+      flash("server error")
+      return set_events_view()
+  else:
+    return set_events_view()
+
+
+def set_events_view():
+  response_artist = ModelArtist.get_artists()
+  artists_json = response_artist.json()
+  artists = []
+  response_theaters = ModelTheater.get_theaters()
+  theaters_json = response_theaters.json()
+  theaters = []
+  for a in artists_json:
+    artists.append(a)
+  for t in theaters_json:
+    theaters.append(t)
+  return render_template('/home.html',artists=artists,theaters=theaters) 
 
 @app.route('/register_theater',methods=['GET','POST'])
 @login_required

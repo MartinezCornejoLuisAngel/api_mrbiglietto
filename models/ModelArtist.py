@@ -17,3 +17,11 @@ class ModelArtist():
             return response  
         except Exception as ex:
             raise Exception(ex)
+
+    @classmethod
+    def get_artists(self):
+        try:
+            response = requests.get(config('URL_BASE_BD')+'/webadminapi/v1/Artist')
+            return response  
+        except Exception as ex:
+            raise Exception(ex)
