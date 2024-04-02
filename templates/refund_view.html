@@ -1,0 +1,198 @@
+{% extends './base_registros.html' %}
+
+{% block title %}Devoluciones{% endblock %}
+
+{% block customCss %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/home.css') }}">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-YA0x9S3pNsLgaWTi2lFbPq24gVq8f4J9HpqyT+fhXr2AUrD8Y0Xm9k5t0M1zVPwJ" crossorigin="anonymous">
+<style>
+    /* Estilo personalizado */
+    .selected-item {
+        background-color: rgb(154, 227, 241);
+        padding: 10px;
+        margin-bottom: 5px;
+    }
+
+    /* Estilo para el contenedor principal */
+    #main-container {
+        width: 70%;
+        background-color: rgb(198, 210, 219);
+        margin: auto;
+        padding-bottom: 2rem;
+        margin-top: 2rem;
+    }
+
+    .list-group-item:hover {
+        cursor: pointer;
+        /* Cambiar el cursor a una mano */
+        background-color: #f0f0f0;
+        /* Cambiar el color de fondo */
+    }
+</style>
+{% endblock %}
+{% block body %}
+<div id="main-container">
+
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Barra lateral -->
+            <div class="col-md-4">
+                <h2>Solicitudes</h2>
+                <div id="datos">
+                    <ul class="list-group">
+                        {% for objeto in list_refund %}
+                        <li class="list-group-item" data-info='{{ objeto | tojson | safe }}'>{{objeto["requestId"] }}
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+            <!-- Área principal -->
+            <div class="col-md-8">
+                <h2>Detalle</h2>
+                <div id="detalle"></div>
+                <br>
+                <button type="submit" id="btnAceptar" class="btn btn-success">Aceptar</button>
+                <button type="submit" id="btnRechazar" class="btn btn-danger">Rechazar</button>
+                {% with messages = get_flashed_messages() %}
+                {% if messages%}
+                <br />
+                {% for message in messages %}
+                <div class="alert alert-primary alert-dismissible" role="alert">
+                    <strong>{{message}}</strong>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+
+                </div>
+                {% endfor %}
+                {% endif%}
+                {% endwith %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Función para mostrar el detalle del dato seleccionado
+    function mostrarDetalle(objeto) {
+        // Parsear el JSON del objeto
+        var objetoCompleto = JSON.parse(objeto);
+        // Construir la cadena con la información del objeto
+        var detalleHTML = `
+        <div class="selected-item">
+            <p>Ticket ID: ${objetoCompleto.ticketId}</p>
+            <p>Request ID: ${objetoCompleto.requestId}</p>
+            <p>Reason: ${objetoCompleto.reason}</p>
+            <p>Status: ${objetoCompleto.status}</p>
+            <p>Request Date Time: ${objetoCompleto.requestDateTime}</p>
+        </div>`;
+        // Insertar la información en el contenedor de detalle
+        document.getElementById('detalle').innerHTML = detalleHTML;
+    }
+
+    // Manejador de eventos para hacer algo cuando se selecciona un dato
+    document.querySelectorAll('.list-group-item').forEach(item => {
+        item.addEventListener('click', function () {
+            mostrarDetalle(this.getAttribute('data-info'));
+        });
+    });
+
+    // Manejador de eventos para el botón de Aceptar
+    document.getElementById('btnAceptar').addEventListener('click', async function () {
+        // Crear el objeto payload
+        var selectedItem = document.querySelector('.list-group-item');
+        if (!selectedItem) {
+            console.error('No se ha seleccionado ningún elemento');
+            return;
+        }
+        // Obtener el requestId del elemento seleccionado
+        var objeto = selectedItem.getAttribute('data-info');
+        if (!objeto) {
+            console.error('No se encontró el requestId del elemento seleccionado');
+            return;
+        }
+        var objeto_json = JSON.parse(objeto);
+        var requestId = objeto_json["requestId"];
+        var payload = {
+            // Aquí puedes construir tu payload según tus necesidades
+            requestId: requestId,
+            answer: 'APPROVED'
+        };
+
+        try {
+            // Realizar la solicitud POST
+            var response = await fetch('/refund_view', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(payload)
+            });
+
+            if (response.ok) {
+                // La solicitud fue exitosa
+                var data = await response.json();
+                // Hacer algo con la respuesta
+                console.log(data);
+                alert("Respuesta enviada y recivida en el servidor")
+                window.location.href = '/refund_view';
+
+            } else {
+                // Manejar el caso de error
+                throw new Error('Error al enviar la solicitud POST');
+            }
+        } catch (error) {
+            // Manejar errores de red u otros errores
+            console.error('Error:', error);
+        }
+    });
+
+    // Manejador de eventos para el botón de Rechazar
+    document.getElementById('btnRechazar').addEventListener('click', async function () {
+        var selectedItem = document.querySelector('.list-group-item');
+        if (!selectedItem) {
+            console.error('No se ha seleccionado ningún elemento');
+            return;
+        }
+        // Obtener el requestId del elemento seleccionado
+        var objeto = selectedItem.getAttribute('data-info');
+        if (!objeto) {
+            console.error('No se encontró el requestId del elemento seleccionado');
+            return;
+        }
+        var objeto_json = JSON.parse(objeto);
+        var requestId = objeto_json["requestId"];
+        var payload = {
+            requestId: requestId,
+            answer: 'DENIED'
+        };
+
+        try {
+            // Realizar la solicitud POST
+            var response = await fetch('/refund_view', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(payload)
+            });
+
+            if (response.ok) {
+                // La solicitud fue exitosa
+                var data = await response.json();
+                // Hacer algo con la respuesta
+                console.log(data);
+                alert("Respuesta enviada y recivida en el servidor")
+                window.location.href = '/refund_view';
+
+            } else {
+                // Manejar el caso de error
+                throw new Error('Error al enviar la solicitud POST');
+            }
+        } catch (error) {
+            // Manejar errores de red u otros errores
+            console.error('Error:', error);
+        }
+    });
+</script>
+{% endblock %}
