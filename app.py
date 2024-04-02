@@ -26,7 +26,7 @@ from models.entities.Theater import Theater
 from models.pub_api import Publisher
 from models.ModelEvent import ModelEvent
 from models.entities.Event import Event
-
+from models.ModelRefund import ModelRefund
 # Conexión a la red de Ethereum (en este caso, una red de prueba)
 web3 = Web3(Web3.HTTPProvider(config('INFURA_NODE')))
 
@@ -798,6 +798,42 @@ def register_artist():
       return render_template('/register_artist.html')
   else:
     return render_template('/register_artist.html')
+  
+@app.route('/refund_view',methods=['GET','POST'])
+@login_required
+def refund_view():
+  if request.method == 'POST':
+    data = request.json
+    request_id = data['requestId']
+    answer = data['answer']
+    result = True
+    if answer == 'APPROVED':
+      result = True
+    elif answer == 'DENIED':
+      result == False
+    else:
+      return jsonify({'message': 'Dato raro'}),500
+    
+    response = ModelRefund.set_answer(request_id,result)
+    if response.status_code == 200:
+      flash("Respuesta enviada y recibida")
+      return jsonify({'message': 'Bien'}),200
+    else:
+      flash("Error al guardar la respuesta")
+      return jsonify({'message': 'mal'}),500
+
+  else:
+    return set_view_refund()
+  
+  
+def set_view_refund():
+  response = ModelRefund.get_refunds()
+  refunds = response.json() 
+  ids = []
+  for r in refunds:     
+    ids.append(r)
+  return render_template('/refund_view.html',list_refund = ids)
+    
 
 @app.route('/register_location',methods=['GET','POST'])
 @login_required
