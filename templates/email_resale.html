@@ -1,0 +1,138 @@
+{% extends 'base.html' %}
+
+{% block customCss %}
+<style>
+.container {
+    max-width: 100%;
+    margin: 0 auto;
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+.logo {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.logo img {
+    width: 100px;
+    height: 100px;
+}
+
+.content {
+    text-align: center;
+}
+
+.message {
+    color: #2B3A55;
+    font-size: 20px;
+    font-weight: 400;
+}
+
+.approved-message {
+    color: green;
+}
+
+.rejected-message {
+    color: red;
+}
+
+.pending-message {
+    color: orange;
+}
+
+.footer {
+    text-align: center;
+    margin-top: 20px;
+    color: #2B3A55;
+    font-size: 16px;
+}
+
+ol {
+    padding: 0;
+    margin: 0;
+    list-style-type: none;
+}
+
+ol li {
+    margin-bottom: 10px;
+}
+
+ol li a {
+    display: block;
+    padding: 10px;   
+    background-color: #b9d3e0;
+    border-radius: 5px;
+    text-decoration: none;
+    color: #333;
+}
+
+/* Media query para ajustar estilos en pantallas pequeñas */
+@media only screen and (max-width: 768px) {
+    .container {
+        padding: 10px;
+    }
+
+    .logo img {
+        width: 80px;
+        height: 80px;
+    }
+
+    .message {
+        font-size: 18px;
+    }
+
+    ol li a {
+        padding: 8px;
+    }
+}
+</style>
+{% endblock %}
+
+{% block body %}
+<div class="logo">
+    <img src="https://firebasestorage.googleapis.com/v0/b/mr-biblietto.appspot.com/o/imgs%2F4.png?alt=media&token=c92b5665-d174-49b7-b640-39f9ee14f38a" alt="Logo">
+</div>
+<div class="container">
+    <div class="content">
+        <div class="message">
+            Hola, por parte del equipo de Mr. Biglietto, te damos la información sobre la venta de tu boleto.
+        </div>
+        <br>
+        {% if status == 'SOLD' %}
+        <div class="approved-message">
+            Tu boleto ha sido vendido. (Ver estado de cuenta)
+        </div>
+        {% elif status == 'UNSOLD' %}
+        <div class="rejected-message">
+            No se pudo vender tu boleto. Te recomendamos:
+        </div>
+        <ol>
+            <li><a href="https://mrbigliettoweb.vercel.app/inventory">Usar tu boleto</a></li>
+            <li><a href="https://mrbigliettoweb.vercel.app/inventory">Devolverlo</a></li>
+        </ol>
+        {% elif status == 'CANCEL' %}
+        <div class="rejected-message">
+            Has cancelado la venta de tu boleto.
+        </div>
+        {% else %}
+        <div class="pending-message">
+            Lo sentimos, hubo un problema con la venta de tu boleto.
+        </div>
+        {% endif %}
+    </div>
+</div>
+<footer class="footer">
+    <div class="contact">
+        Vive la máxima experiencia y seguridad en 
+        <br>
+        <a href="https://mrbigliettoweb.vercel.app/">Mr. Biglietto</a>
+    </div>  
+    <br>
+    <div class="contact">
+        Cualquier duda que se te presente, contáctanos.
+        <br>
+        Contacto: <a href="mailto:mrbigliettoapp@gmail.com">mrbigliettoapp@gmail.com</a>
+    </div>    
+</footer>
+{% endblock %}
