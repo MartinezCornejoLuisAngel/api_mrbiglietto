@@ -578,6 +578,44 @@ def send_email_help():
     return jsonify({'status': 'success'}),200
   except Exception as e:
     return jsonify({'error':str(e)}), 500
+  
+def send_email_resale_to(email, status):
+    #Configuración del servidor SMTP
+    servidor_smtp = config('SERVIDOR_SMPT')
+    puerto_smtp = config('PUERTO_SMPT')
+    remitente = config('CORREO_REMITENTE')
+    contraseña = config('PASSWORD_GMAIL')
+
+    # Crear el mensaje
+    mensaje = MIMEMultipart("alternative")
+    mensaje['From'] = remitente
+    mensaje['To'] = email
+    mensaje['Subject'] = "Respuesta de venta de boleto"
+
+    cuerpo_mensaje = render_template('email_resale.html',status=status)
+    # Adjuntar parte del mensaje
+    mensaje.attach(MIMEText(cuerpo_mensaje, "html"))
+
+	# Iniciar sesión en el servidor SMTP y enviar el mensaje
+    with smtplib.SMTP(servidor_smtp, puerto_smtp) as servidor:
+        servidor.starttls()
+        servidor.login(remitente, contraseña)
+        servidor.send_message(mensaje)
+
+
+@app.route('/api/v1/send_email_resale',methods=['POST'])
+def send_email_resale():
+  if not request.json or 'email' not in request.json or 'status' not in request.json:
+    return jsonify({'error':'Missing parameters'}), 400
+  
+  email = request.json['email']
+  status = request.json['status']
+  try:
+    send_email_resale_to(email,status)
+    return jsonify({'status': 'success'}),200
+  except Exception as e:
+    return jsonify({'error':str(e)}), 500
+  
 
 def send_email_refund_to(email,id_refund,message):
   # Configuración del servidor SMTP
@@ -904,6 +942,10 @@ def status_404(errror):
 #def handle_unhandled_exception(e):
 #  flash("Error en servidor...")
 #  return redirect(url_for('home'))
+
+#@app.route('/api/v1/test_email/<status>',methods=['GET'])
+#def test_email(status):
+#  return render_template('email_resale.html',status=status)
  
 app.register_error_handler(401,status_401)
 app.register_error_handler(404,status_404)
