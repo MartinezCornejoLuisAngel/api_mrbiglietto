@@ -715,10 +715,12 @@ def home():
     section_list = []
     sections = theater_dict['sections']
     for s in sections:
+      
       id_section = s['idSection']
       available_seats = s['availableSeats']
       price = form_data[f"precio{id_section}"]
-      section = Section(id_section,available_seats,price)
+      section = Section()
+      section.contructor(id_section,available_seats,price)
       section_list.append(section)       
     
     event = Event(id_artist,id_theater,date_hour,section_list)
@@ -741,16 +743,17 @@ def set_events_view():
   artists = []
   response_artist = ModelArtist.get_artists()
   response_theaters = ModelTheater.get_theaters()
-  if response_artist.status_code == 200 and response_theaters.status_code == 200: 
+  if response_artist.status_code == 200:
     artists_json = response_artist.json()
-    theaters_json = response_theaters.json()
     for a in artists_json:
       artists.append(a)
+  
+  if response_theaters.status_code == 200: 
+    theaters_json = response_theaters.json()
     for t in theaters_json:
-      theaters.append(t)
-    return render_template('/home.html',artists=artists,theaters=theaters) 
-  else:
-    return render_template('/home.html',artists=artists,theaters=theaters) 
+      theaters.append(t)  
+  return render_template('/home.html',artists=artists,theaters=theaters) 
+ 
 
 @app.route('/register_theater',methods=['GET','POST'])
 @login_required
@@ -773,6 +776,8 @@ def register_theater():
       if section_key not in aux_dict:
         break
     
+      print(aux_dict)
+      print(section_index)
       section_name = aux_dict.get(section_key)
       num_columns = aux_dict.get(f"num_columns_{section_index}")
       num_rows = aux_dict.get(f"num_rows_{section_index}")
