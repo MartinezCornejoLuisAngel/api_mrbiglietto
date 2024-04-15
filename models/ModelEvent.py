@@ -11,7 +11,7 @@ class ModelEvent():
                 serilized_sections.append({
                     'idSection':int(section.id_section),
                     'availableSeats':int(section.available_seats),
-                    'price ' : float(section.price)
+                    'price' : float(section.price)
                 })
             payload = {'idArtist':event.id_artist,
                     'idTheater':event.id_theater,
