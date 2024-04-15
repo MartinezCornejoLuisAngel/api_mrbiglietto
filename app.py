@@ -854,13 +854,15 @@ def register_artist():
 def refund_view():
   if request.method == 'POST':
     data = request.json
+    
     request_id = data['requestId']
     answer = data['answer']
     result = True
+    print(answer)
     if answer == 'APPROVED':
       result = True
     elif answer == 'DENIED':
-      result == False
+      result = False
     else:
       return jsonify({'message': 'Dato raro'}),500
     
