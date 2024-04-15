@@ -737,17 +737,20 @@ def home():
 
 
 def set_events_view():
-  response_artist = ModelArtist.get_artists()
-  artists_json = response_artist.json()
-  artists = []
-  response_theaters = ModelTheater.get_theaters()
-  theaters_json = response_theaters.json()
   theaters = []
-  for a in artists_json:
-    artists.append(a)
-  for t in theaters_json:
-    theaters.append(t)
-  return render_template('/home.html',artists=artists,theaters=theaters) 
+  artists = []
+  response_artist = ModelArtist.get_artists()
+  response_theaters = ModelTheater.get_theaters()
+  if response_artist.status_code == 200 and response_theaters.status_code == 200: 
+    artists_json = response_artist.json()
+    theaters_json = response_theaters.json()
+    for a in artists_json:
+      artists.append(a)
+    for t in theaters_json:
+      theaters.append(t)
+    return render_template('/home.html',artists=artists,theaters=theaters) 
+  else:
+    return render_template('/home.html',artists=artists,theaters=theaters) 
 
 @app.route('/register_theater',methods=['GET','POST'])
 @login_required
@@ -802,12 +805,16 @@ def register_theater():
     return send_register_theater_view()
 
 def send_register_theater_view():
-  response = ModelLocation.get_locations()
-  locations = response.json() 
   opciones = []
-  for location in locations:     
-    opciones.append(location)  
-  return render_template('/register_theater.html',lista=opciones)
+  response = ModelLocation.get_locations()
+  if response.status_code == 200:
+    locations = response.json() 
+    for location in locations:     
+      opciones.append(location)  
+    return render_template('/register_theater.html',lista=opciones)
+  else:
+    return render_template('/register_theater.html',lista=opciones)
+    
 
 
 @app.route('/register_artist',methods=['GET','POST'])
@@ -865,12 +872,16 @@ def refund_view():
   
   
 def set_view_refund():
-  response = ModelRefund.get_refunds()
-  refunds = response.json() 
   ids = []
-  for r in refunds:     
-    ids.append(r)
-  return render_template('/refund_view.html',list_refund = ids)
+  response = ModelRefund.get_refunds()
+  if response.status_code == 200:
+    refunds = response.json() 
+    
+    for r in refunds:     
+      ids.append(r)
+    return render_template('/refund_view.html',list_refund = ids)
+  else:
+    return render_template('/refund_view.html',list_refund = ids)
     
 
 @app.route('/register_location',methods=['GET','POST'])
@@ -899,12 +910,16 @@ def register_location():
       flash("Server error")
       return render_template('/register_location.html')
   else:
-    response = ModelLocation.get_locations()
-    locations = response.json() 
     ids = []
-    for location in locations:     
-      ids.append(location['idLocation'])  
-    return render_template('/register_location.html',ids=ids)
+    response = ModelLocation.get_locations()
+    if response.status_code == 200:
+      locations = response.json() 
+      
+      for location in locations:     
+        ids.append(location['idLocation'])  
+      return render_template('/register_location.html',ids=ids)
+    else:
+      return render_template('/register_location.html',ids=ids)
 
 #PUB SUB///////////////////////////////////////////////////////////////////////////////////////////
 @app.route('/pub_task', methods=['GET','POST'])
