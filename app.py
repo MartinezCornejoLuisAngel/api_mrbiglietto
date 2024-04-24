@@ -937,7 +937,7 @@ def pub_task():
         
         id_event = request.json['id_event']
         id_client = request.json['id_client']
-        id_ticket = request.json['id_client']
+        id_ticket = request.json['id_ticket']
         email = request.json['email']
         username = request.json['username']
         event_name = request.json['event_name']
