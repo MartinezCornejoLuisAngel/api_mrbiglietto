@@ -628,7 +628,7 @@ def send_email_date_to(email, name_event, ap_date,event_id):
     mensaje = MIMEMultipart("alternative")
     mensaje['From'] = remitente
     mensaje['To'] = email
-    mensaje['Subject'] = "Respuesta de venta de boleto"
+    mensaje['Subject'] = "Confirmación de cita"
 
     cuerpo_mensaje = render_template('email_date.html',name_event=name_event,ap_date=ap_date,event_id=event_id)
     # Adjuntar parte del mensaje
