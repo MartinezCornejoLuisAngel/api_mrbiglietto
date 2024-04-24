@@ -617,6 +617,46 @@ def send_email_resale():
     return jsonify({'error':str(e)}), 500
   
 
+def send_email_date_to(email, name_event, ap_date,event_id):
+    #Configuración del servidor SMTP
+    servidor_smtp = config('SERVIDOR_SMPT')
+    puerto_smtp = config('PUERTO_SMPT')
+    remitente = config('CORREO_REMITENTE')
+    contraseña = config('PASSWORD_GMAIL')
+
+    # Crear el mensaje
+    mensaje = MIMEMultipart("alternative")
+    mensaje['From'] = remitente
+    mensaje['To'] = email
+    mensaje['Subject'] = "Respuesta de venta de boleto"
+
+    cuerpo_mensaje = render_template('email_date.html',name_event=name_event,ap_date=ap_date,event_id=event_id)
+    # Adjuntar parte del mensaje
+    mensaje.attach(MIMEText(cuerpo_mensaje, "html"))
+
+	# Iniciar sesión en el servidor SMTP y enviar el mensaje
+    with smtplib.SMTP(servidor_smtp, puerto_smtp) as servidor:
+        servidor.starttls()
+        servidor.login(remitente, contraseña)
+        servidor.send_message(mensaje)
+  
+  
+@app.route('/api/v1/send_email_date',methods=['POST'])
+def send_email_date():
+  if not request.json or 'email' not in request.json or 'name_event' not in request.json or 'appointment_date' not in request.json or 'event_id' not in request.json:
+    return jsonify({'error':'Missing parameters'}), 400
+  
+  email = request.json['email']
+  name_event = request.json['name_event']
+  ap_date = request.json['appointment_date']
+  event_id = request.json['event_id']
+  try:
+    send_email_date_to(email,name_event,ap_date,event_id)
+    return jsonify({'status': 'success'}),200
+  except Exception as e:
+    return jsonify({'error':str(e)}), 500
+  
+
 def send_email_refund_to(email,id_refund,message):
   # Configuración del servidor SMTP
     servidor_smtp = config('SERVIDOR_SMPT')
