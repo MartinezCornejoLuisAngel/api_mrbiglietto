@@ -643,13 +643,13 @@ def send_email_date_to(email, name_event, ap_date,event_id):
   
 @app.route('/api/v1/send_email_date',methods=['POST'])
 def send_email_date():
-  if not request.json or 'email' not in request.json or 'name_event' not in request.json or 'appointment_date' not in request.json or 'event_id' not in request.json:
+  if not request.json or 'email' not in request.json or 'name_event' not in request.json or 'appointment_date' not in request.json or 'artist_id' not in request.json:
     return jsonify({'error':'Missing parameters'}), 400
   
   email = request.json['email']
   name_event = request.json['name_event']
   ap_date = request.json['appointment_date']
-  event_id = request.json['event_id']
+  event_id = request.json['artist_id']
   try:
     send_email_date_to(email,name_event,ap_date,event_id)
     return jsonify({'status': 'success'}),200
