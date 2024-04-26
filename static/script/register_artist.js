@@ -42,6 +42,20 @@ function initializeFirebase(config) {
   // Aquí puedes seguir con la inicialización de Firebase
 }
 
+
+document.getElementById('artistImage').addEventListener('change', function() {
+  const fileInput = document.getElementById('artistImage');
+  const filePath = fileInput.value;
+  // Lista de extensiones permitidas
+  const allowedExtensions = /(\.jpg|\.jpeg|\.png|\.gif)$/i;
+  // Verificar si la extensión del archivo seleccionado es permitida
+  if (!allowedExtensions.exec(filePath)) {
+      alert('Por favor, selecciona un archivo de imagen válido (JPEG, PNG, GIF).');
+      fileInput.value = '';
+      return false;
+  }
+});
+
 function uploadImage() {
   const file = document.getElementById("artistImage").files[0];
   const storageRef = firebase.storage().ref();

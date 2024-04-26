@@ -12,6 +12,19 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 });
 
+document.getElementById('theaterImage').addEventListener('change', function() {
+  const fileInput = document.getElementById('theaterImage');
+  const filePath = fileInput.value;
+  // Lista de extensiones permitidas
+  const allowedExtensions = /(\.jpg|\.jpeg|\.png|\.gif)$/i;
+  // Verificar si la extensión del archivo seleccionado es permitida
+  if (!allowedExtensions.exec(filePath)) {
+      alert('Por favor, selecciona un archivo de imagen válido (JPEG, PNG, GIF).');
+      fileInput.value = '';
+      return false;
+  }
+});
+
 function initializeFirebase(config) {
   // Inicializa Firebase con la configuración proporcionada
   firebase.initializeApp(config);
