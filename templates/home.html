@@ -34,6 +34,7 @@
                 {% endwith %}
                 <div class="form-floating">
                   <select class="form-control" id="artists" name="artists" required>
+                    <option value="" disabled selected>Selecciona Artista</option>
                     {% for a in artists %}
                     <option value="{{ a|safe }}">{{ a }}</option>
                     {% endfor %}
@@ -43,6 +44,7 @@
                 <br>
                 <div class="form-floating">
                   <select class="form-control" id="theaters" name="theaters" required>
+                    <option value="" disabled selected>Selecciona Teatro</option>
                     {% for t in theaters %}
                     <option value="{{ t|safe }}">{{ t }}</option>
                     {% endfor %}
