@@ -90,9 +90,20 @@
         document.getElementById('detalle').innerHTML = detalleHTML;
     }
 
+
+    var selectedItem = null;
+
     // Manejador de eventos para hacer algo cuando se selecciona un dato
     document.querySelectorAll('.list-group-item').forEach(item => {
         item.addEventListener('click', function () {
+            // Remover la clase 'selected' del elemento previamente seleccionado
+            if (selectedItem) {
+                selectedItem.classList.remove('selected');
+            }
+            // Agregar la clase 'selected' al elemento seleccionado
+            selectedItem = this;
+            selectedItem.classList.add('selected');
+
             mostrarDetalle(this.getAttribute('data-info'));
         });
     });
@@ -100,9 +111,8 @@
     // Manejador de eventos para el botón de Aceptar
     document.getElementById('btnAceptar').addEventListener('click', async function () {
         // Crear el objeto payload
-        var selectedItem = document.querySelector('.list-group-item');
         if (!selectedItem) {
-            console.error('No se ha seleccionado ningún elemento');
+            alert('Ningún elemento está seleccionado')
             return;
         }
         // Obtener el requestId del elemento seleccionado
@@ -149,9 +159,9 @@
 
     // Manejador de eventos para el botón de Rechazar
     document.getElementById('btnRechazar').addEventListener('click', async function () {
-        var selectedItem = document.querySelector('.list-group-item');
+        // Crear el objeto payload
         if (!selectedItem) {
-            console.error('No se ha seleccionado ningún elemento');
+            alert('Ningún elemento está seleccionado')
             return;
         }
         // Obtener el requestId del elemento seleccionado
@@ -163,6 +173,7 @@
         var objeto_json = JSON.parse(objeto);
         var requestId = objeto_json["requestId"];
         var payload = {
+            // Aquí puedes construir tu payload según tus necesidades
             requestId: requestId,
             answer: 'DENIED'
         };

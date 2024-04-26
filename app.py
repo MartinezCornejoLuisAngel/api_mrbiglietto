@@ -894,6 +894,7 @@ def register_artist():
 def refund_view():
   if request.method == 'POST':
     data = request.json
+    print(data)
     
     request_id = data['requestId']
     answer = data['answer']
