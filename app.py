@@ -325,12 +325,6 @@ def get_ticket_data():
 
 
 #/////////////////////////////////// API EMAIL /////////////////////////////////////////
-def generar_enlace_validacion():
-    # Generar un enlace único de validación (por ejemplo, utilizando una cadena aleatoria)
-    longitud = 20
-    caracteres = string.ascii_letters + string.digits
-    enlace = ''.join(random.choice(caracteres) for i in range(longitud))
-    return enlace
 
 def enviar_correo_validacion(correo_destino,token):
     # Configuración del servidor SMTP
@@ -340,7 +334,7 @@ def enviar_correo_validacion(correo_destino,token):
     contraseña = config('PASSWORD_GMAIL')
 
     # Crear el mensaje
-    mensaje = MIMEMultipart()
+    mensaje = MIMEMultipart("alternative")
     mensaje['From'] = remitente
     mensaje['To'] = correo_destino
     mensaje['Subject'] = "Validación de correo electrónico"
@@ -355,23 +349,16 @@ def enviar_correo_validacion(correo_destino,token):
 
 @app.route('/send_validation_email', methods=['POST'])
 def send_validation_email():
-    # Asegúrate de que el cuerpo de la solicitud contenga los parámetros necesarios para el método create_event
-    if not request.json or 'email_des' not in request.json or 'token' not in request.json:
-        return jsonify({'error': 'Missing parameters'}), 400
+  if not request.json or 'email_des' not in request.json or 'token' not in request.json:
+      return jsonify({'error': 'Missing parameters'}), 400
 
-    email_des = request.json['email_des']
-    token = request.json['token']
-    # Llama al método create_event del contrato inteligente con los parámetros proporcionados
-    try:
-        enlace_validacion = generar_enlace_validacion()
-        enviar_correo_validacion(email_des,token)
-        return jsonify({'status': 'success'}),200
-    except Exception as e:
-        return jsonify({'error': str(e)}), 500
-
-def generar_codigo_autenticacion():
-    # Generar un código de autenticación de 6 dígitos
-    return ''.join(random.choices(string.digits, k=6))
+  email_des = request.json['email_des']
+  token = request.json['token']
+  try:
+      enviar_correo_validacion(email_des,token)
+      return jsonify({'status': 'success'}),200
+  except Exception as e:
+      return jsonify({'error': str(e)}), 500
 
 def enviar_codigo_autenticacion(correo_destino,codigo):
     # Configuración del servidor SMTP
@@ -441,27 +428,18 @@ def enviar_codigo_autenticacion(correo_destino,codigo):
 
 @app.route('/api/v1/send_2fa_email', methods=['POST'])
 def send_2fa_email():
-    # Asegúrate de que el cuerpo de la solicitud contenga los parámetros necesarios para el método create_event
-    if not request.json or 'email_des' not in request.json or 'token' not in request.json:
-        return jsonify({'error': 'Missing parameters'}), 400
+  # Asegúrate de que el cuerpo de la solicitud contenga los parámetros necesarios para el método create_event
+  if not request.json or 'email_des' not in request.json or 'token' not in request.json:
+      return jsonify({'error': 'Missing parameters'}), 400
 
-    email_des = request.json['email_des']
-    token = request.json['token']
-    # Llama al método create_event del contrato inteligente con los parámetros proporcionados
-    try:
-        codigo = generar_codigo_autenticacion()
-        payload = {'code':int(codigo)}
-        headers = {'Authorization':'Bearer '+token}
-        response = requests.put(config('URL_BASE_BD')+'/api/v1/TwoFactorAuth',json=payload,headers=headers)
-       
-        if response.status_code == 200:
-          enviar_codigo_autenticacion(email_des, codigo)
-          return jsonify({'status': 'success'}),200
-        else:
-          return jsonify({'error': 'Failed to send 2FA code'}), response.status_code
-
-    except Exception as e:
-        return jsonify({'error': str(e)}), 500
+  email_des = request.json['email_des']
+  codigo = request.json['token']
+  # Llama al método create_event del contrato inteligente con los parámetros proporcionados
+  try:
+    enviar_codigo_autenticacion(email_des, codigo)
+    return jsonify({'status': 'success'}),200
+  except Exception as e:
+      return jsonify({'error': str(e)}), 500
 
 def enviar_notificacion(email,username,event_name):
     # Configuración del servidor SMTP
