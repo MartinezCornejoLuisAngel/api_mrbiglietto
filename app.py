@@ -5,8 +5,6 @@ from decouple import config
 import smtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
-import random
-import string
 from flask_cors import CORS
 import re
 import json
@@ -27,6 +25,7 @@ from models.pub_api import Publisher
 from models.ModelEvent import ModelEvent
 from models.entities.Event import Event
 from models.ModelRefund import ModelRefund
+import stripe
 # Conexión a la red de Ethereum (en este caso, una red de prueba)
 web3 = Web3(Web3.HTTPProvider(config('INFURA_NODE')))
 
@@ -970,6 +969,37 @@ def pub_task():
                 raise Exception(ex)
     else:
         return "<h1>Get</h1>"
+    
+stripe.api_key = config('SECRET_API_KEY_STRIPE')    
+      
+@app.route('/create-payment-intent',methods=['POST'])
+def create_payment_intent():
+  if not request.json or 'amount' not in request.json:
+    return jsonify({'error':'Missing parameters'}), 400
+  
+  try:
+    amount = int(request.json['amount'])
+  except ValueError:
+    return jsonify({'error': 'Amount must be an integer'}), 400
+  
+  try:
+    payment_intent = stripe.PaymentIntent.create(
+      currency="mxn",
+      amount=amount,
+      payment_method_types=["card"],
+      confirmation_method="automatic"
+    )
+    
+    return jsonify({
+      "clientSecret":payment_intent.client_secret
+    })
+  except stripe.error.StripeError as e:
+    return jsonify({
+      "error":{
+        "message":str(e)
+      }
+    }), 400
+
 
 
 def status_401(error):
