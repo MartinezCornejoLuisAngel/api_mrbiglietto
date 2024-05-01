@@ -504,7 +504,7 @@ def enviar_notificacion_bc(email,username,event_name):
         servidor.send_message(mensaje)
       
 @app.route('/api/v2/send_notification', methods=['POST'])
-def send_notification():
+def send_notification_bc():
     # Asegúrate de que el cuerpo de la solicitud contenga los parámetros necesarios para el método create_event
     if not request.json or 'email' not in request.json or 'username' not in request.json or 'event_name' not in request.json:
         return jsonify({'error': 'Missing parameters'}), 400
