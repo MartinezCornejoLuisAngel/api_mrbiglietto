@@ -479,6 +479,46 @@ def send_notification():
         return jsonify({'status': 'success'}),200
     except Exception as e:
         return jsonify({'error': str(e)}), 500
+      
+def enviar_notificacion_bc(email,username,event_name):
+    # Configuración del servidor SMTP
+    servidor_smtp = config('SERVIDOR_SMPT')
+    puerto_smtp = config('PUERTO_SMPT')
+    remitente = config('CORREO_REMITENTE')
+    contraseña = config('PASSWORD_GMAIL')
+
+    # Crear el mensaje
+    mensaje = MIMEMultipart("alternative")
+    mensaje['From'] = remitente
+    mensaje['To'] = email
+    mensaje['Subject'] = "Notificacion"
+    # Cuerpo del mensaje en HTML con CSS
+    cuerpo_mensaje = render_template('email_notification_bc.html',username=username,event_name=event_name)
+    # Adjuntar parte del mensaje
+    mensaje.attach(MIMEText(cuerpo_mensaje, "html"))
+
+	# Iniciar sesión en el servidor SMTP y enviar el mensaje
+    with smtplib.SMTP(servidor_smtp, puerto_smtp) as servidor:
+        servidor.starttls()
+        servidor.login(remitente, contraseña)
+        servidor.send_message(mensaje)
+      
+@app.route('/api/v2/send_notification', methods=['POST'])
+def send_notification():
+    # Asegúrate de que el cuerpo de la solicitud contenga los parámetros necesarios para el método create_event
+    if not request.json or 'email' not in request.json or 'username' not in request.json or 'event_name' not in request.json:
+        return jsonify({'error': 'Missing parameters'}), 400
+
+    email = request.json['email']
+    username = request.json['username']
+    event_name = request.json['event_name']
+    
+    # Llama al método create_event del contrato inteligente con los parámetros proporcionados
+    try:
+        enviar_notificacion_bc(email,username,event_name)
+        return jsonify({'status': 'success'}),200
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
 
 def send_change_pass(correo_destino,token):
     # Configuración del servidor SMTP
