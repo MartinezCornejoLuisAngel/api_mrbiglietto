@@ -19,6 +19,6 @@ class ModelUser():
     @classmethod
     def get_by_username(self,user):
         try:
-            return User(1,"Administrador Cornejo",None)
+            return User(1,"Cornejo",None)
         except Exception as ex:
             raise Exception(ex)
