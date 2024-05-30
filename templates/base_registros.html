@@ -15,10 +15,13 @@
     {%block customCss%}
     {%endblock%}
 </head>
-<body class="text-center">
+<body class="text-center body">
     <div class="col-md-3 sidebar">
-        <h3>Welcome, {{current_user.username}}</h3>
-        <ul class="list-unstyled mt-4">
+      <div class="card">
+      <div class="card-header">
+        <h3>Bienvenido, {{current_user.username}}</h3>
+      </div>
+        <ul class="list-unstyled mt-4 ul_s" >
           <li><a href="{{url_for('home')}}" class="sidebar-link-btn">Registrar Evento</a></li>
           <li><a href="{{url_for('register_theater')}}" class="sidebar-link-btn">Registrar Teatro</a></li>
           <li><a href="{{url_for('register_artist')}}" class="sidebar-link-btn">Registrar Artista</a></li>
@@ -28,6 +31,8 @@
 
         </ul>
       </div>
+    </div>
+      
     {%block body%}
     {%endblock%}
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js" integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r" crossorigin="anonymous"></script>

@@ -4,9 +4,9 @@
     top: 0;
     left: 0;
     height: 100%;
-    width: 250px;
+    width: 15%;
     padding: 20px;
-    background-color: #2B3A55; /* Azul cielo */
+    background-color: #2b3a55; /* Azul cielo */
     color: #000; /* Color de texto */
   }
 
@@ -26,7 +26,7 @@
     display: block;
     width: 100%;
     padding: 10px;
-    background-color: #87b9ed; /* Azul primario de Bootstrap */
+    background-color: #7393a7; /* Azul primario de Bootstrap */
     color: #fff; /* Color de texto */
     border: none;
     border-radius: 5px;
@@ -37,13 +37,21 @@
   .sidebar-link-btn:hover {
     text-decoration: none;
     color: #000;
-    background-color: #2970bb; /* Cambia a un tono más oscuro al pasar el ratón */
+    background-color: #b5cfd8; /* Cambia a un tono más oscuro al pasar el ratón */
   }
+
+.body{
+  background-color: #7393a7;
+}
 
 /* Estilo adicional para el contenido principal */
 .main-content {
-    margin-left: 250px; /* Margen izquierdo igual al ancho del sidebar */
-    padding-top: 20px; /* Espacio superior */
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100%;
+    margin-left: 15%; /* Margen izquierdo igual al ancho del sidebar */
+    padding-top: 5%; /* Espacio superior */
 }
 
 .main-title {
@@ -51,6 +59,10 @@
   }
 
 .main-content .card {
-    width: 60%; /* Ancho del 60% */
+    width: 80%; /* Ancho del 60% */
     margin: auto; /* Centrar el cardview */
+}
+
+.ul_s{
+  margin: 3px;
 }
